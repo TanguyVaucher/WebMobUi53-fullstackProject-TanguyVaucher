@@ -104,7 +104,7 @@ Chaque page Blade qui embarque une app Vue y injecte son entrypoint Vite via ce 
 ```blade
 <x-default-layout>
     <x-slot:scripts>
-        @vite(['resources/js/poll-builder.js'])
+        @vite(['resources/js/poll-dashboard-integrated.js'])
     </x-slot>
 
     <div id="app"></div>
@@ -112,6 +112,33 @@ Chaque page Blade qui embarque une app Vue y injecte son entrypoint Vite via ce 
 ```
 
 Ainsi chaque page charge uniquement son propre bundle JS — pas de JS chargé globalement pour toutes les pages.
+
+### Layout standalone minimal
+
+Pour une app Vue qui ne doit pas embarquer le header/footer Laravel, un layout dédié
+`vue-app-layout.blade.php` est disponible. Il conserve uniquement :
+- les métadonnées HTML (`title`, `description`, `viewport`)
+- le CSS global via `@vite(['resources/css/app.css'])`
+- le slot `scripts` pour injecter l'entrypoint Vite de la page
+
+Exemple :
+
+```blade
+<x-vue-app-layout>
+    <x-slot:title>
+        Mon app Vue
+    </x-slot>
+
+    <x-slot:scripts>
+        @vite(['resources/js/mon-app.js'])
+    </x-slot>
+
+    <div id="app"></div>
+</x-vue-app-layout>
+```
+
+Le composant n'ajoute ni conteneur, ni navigation, ni footer, pour laisser l'app Vue
+piloter entièrement sa mise en page.
 
 ### `vite.config.js`
 
@@ -121,8 +148,8 @@ Chaque entrypoint Vue est déclaré dans les `input` de Vite pour être compilé
 laravel({
     input: [
         'resources/css/app.css',
-        'resources/js/poll-results.js',
-        'resources/js/poll-builder.js',
+        'resources/js/poll-dashboard.js',
+        'resources/js/poll-dashboard-integrated.js',
     ],
 }),
 ```
@@ -134,6 +161,6 @@ Chaque entrypoint Vue importe `bootstrap.js` avant le montage de l'app :
 ```js
 import './bootstrap';
 import { createApp } from 'vue';
-import App from './AppPollBuilder.vue';
+import App from './AppPollDashboardIntegrated.vue';
 createApp(App).mount('#app');
 ```

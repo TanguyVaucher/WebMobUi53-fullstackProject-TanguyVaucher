@@ -9,7 +9,7 @@
 
   const { fetchApiToRef } = useFetchApi();
 
-  const { data: getResult, error: getError, fetchNow } = fetchApiToRef({ url: 'polls/Fx9xzVKwQb6EeBF9IAGsRcTPXahiwjV' });
+  const { data: getResult, error: getError, fetchNow } = fetchApiToRef({ url: 'polls/' });
   const { data: postResult, error: postError } = fetchApiToRef({ url: '/foo', data: { id: 1 } });
 
   function handleError(err) {
@@ -28,10 +28,10 @@
 </script>
 
 <template>
-  <h1>Builder</h1>
+  <h1>Dashboard intégré</h1>
 
   <section>
-    <h2>GET /api/v1/foo</h2>
+    <h2>GET /api/v1/polls</h2>
     <pre v-if="getResult">{{ getResult }}</pre>
     <p v-else>Chargement...</p>
   </section>
