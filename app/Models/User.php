@@ -28,4 +28,20 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Post::class, 'likes')->using(Like::class)->withTimestamps()->withPivot('reaction');
     }
+
+    /**
+     * Get the polls created by the user.
+     */
+    public function polls(): HasMany
+    {
+        return $this->hasMany(Poll::class);
+    }
+
+    /**
+     * Get the poll votes cast by the user.
+     */
+    public function pollVotes(): HasMany
+    {
+        return $this->hasMany(PollVote::class);
+    }
 }
