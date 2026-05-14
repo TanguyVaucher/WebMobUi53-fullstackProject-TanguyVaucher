@@ -36,7 +36,7 @@ const settings = ref({
     allow_multiple_choices: props.poll?.allow_multiple_choices ?? false,
     allow_vote_change:      props.poll?.allow_vote_change ?? false,
     results_public:         props.poll?.results_public ?? false,
-    duration:               props.poll?.duration ?? null,
+    duration:               props.poll?.duration ?? 3600,
     is_draft:               props.poll?.is_draft ?? true,
 });
 
@@ -194,7 +194,7 @@ async function submit() {
                 <div class="space-y-6 px-8 py-8">
 
                     <!-- Paramètres -->
-                    <div class="rounded-2xl border border-slate-100 bg-slate-50/60 px-4 py-4">
+                    <div class="rounded-2xl border border-slate-100 bg-slate-100/60 px-4 py-4">
                         <p class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-4">Paramètres du sondage</p>
                         <PollSettings v-model="settings" @depublish="onDepublish" />
                     </div>

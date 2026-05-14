@@ -36,7 +36,7 @@ const multiplier = ref(1);
     <div class="space-y-5">
         <!-- Toggles booléens -->
         <label class="flex items-center justify-between cursor-pointer">
-            <span class="text-lg font-medium text-slate-700">Choix multiple</span>
+            <span class="text-base font-medium text-slate-700">Choix multiple</span>
             <button
                 type="button"
                 @click="update('allow_multiple_choices', !modelValue.allow_multiple_choices)"
@@ -49,7 +49,7 @@ const multiplier = ref(1);
         </label>
 
         <label class="flex items-center justify-between cursor-pointer">
-            <span class="text-lg font-medium text-slate-700">Résultats publics</span>
+            <span class="text-base font-medium text-slate-700">Résultats publics</span>
             <button
                 type="button"
                 @click="update('results_public', !modelValue.results_public)"
@@ -62,7 +62,7 @@ const multiplier = ref(1);
         </label>
 
         <label class="flex items-center justify-between cursor-pointer">
-            <span class="text-lg font-medium text-slate-700">Modifier le vote</span>
+            <span class="text-base font-medium text-slate-700">Modifier le vote</span>
             <button
                 type="button"
                 @click="update('allow_vote_change', !modelValue.allow_vote_change)"
@@ -77,7 +77,7 @@ const multiplier = ref(1);
         <!-- Durée en minutes -->
         <div class="space-y-2">
             <div class="flex items-center justify-between">
-                <span class="text-lg font-medium text-slate-700">Durée (en minutes) <span class="text-red-400 text-2xl leading-none relative" style="top: -4px; margin-left: -2px">*</span></span>
+                <span class="text-base font-medium text-slate-700">Durée (en min)</span>
                 <div class="flex items-center gap-1.5">
                     <!-- Multiplicateur chevrons -->
                     <div class="flex flex-col items-center">
@@ -91,13 +91,13 @@ const multiplier = ref(1);
                         </button>
                     </div>
                     <button type="button" @click="setDuration(60 * multiplier)"
-                        class="rounded-lg px-2.5 py-1 text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-600 transition-colors">{{ multiplier }}h</button>
+                        class="rounded-lg px-2.5 py-1 text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-600 transition-colors w-[4.5rem] text-center">{{ multiplier }} heure{{ multiplier > 1 ? 's' : '' }}</button>
                     <button type="button" @click="setDuration(1440 * multiplier)"
-                        class="rounded-lg px-2.5 py-1 text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-600 transition-colors">{{ multiplier }} jour{{ multiplier > 1 ? 's' : '' }}</button>
+                        class="rounded-lg px-2.5 py-1 text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-600 transition-colors w-[4.5rem] text-center">{{ multiplier }} jour{{ multiplier > 1 ? 's' : '' }}</button>
                     <button type="button" @click="setDuration(10080 * multiplier)"
-                        class="rounded-lg px-2.5 py-1 text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-600 transition-colors">{{ multiplier }} sem.</button>
+                        class="rounded-lg px-2.5 py-1 text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-600 transition-colors w-[4.5rem] text-center">{{ multiplier }} sem.</button>
                     <button type="button" @click="setDuration(43200 * multiplier)"
-                        class="rounded-lg px-2.5 py-1 text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-600 transition-colors">{{ multiplier }} mois</button>
+                        class="rounded-lg px-2.5 py-1 text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-600 transition-colors w-[4.5rem] text-center">{{ multiplier }} mois</button>
                 </div>
             </div>
             <div class="relative flex items-stretch">

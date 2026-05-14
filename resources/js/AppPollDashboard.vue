@@ -61,6 +61,14 @@ function backToList() {
     view.value = 'list';
 }
 
+function backFromResults() {
+    if (props.token) {
+        view.value = 'vote';
+    } else {
+        backToList();
+    }
+}
+
 function onSaved() {
     fetchPolls();
     backToList();
@@ -98,8 +106,8 @@ function onVoted() {
             <div class="flex items-center gap-3">
                 <!-- Bouton retour si pas sur la liste -->
                 <button
-                    v-if="view !== 'list' && !props.token"
-                    @click="backToList"
+                    v-if="view !== 'list' && (!props.token || view === 'results')"
+                    @click="view === 'results' ? backFromResults() : backToList()"
                     style="margin-top: -4px"
                     class="w-9 h-9 flex items-center justify-center rounded-xl
                            bg-black/10 hover:bg-black/20 text-slate-700
@@ -214,8 +222,9 @@ function onVoted() {
                  class="max-w-lg mx-auto px-6 py-6">
                 <PollResults
                     :token="activeToken"
-                    :has-back="!props.token"
-                    @back="backToList"
+                    :has-back="true"
+                    :back-label="props.token ? '← Retour au sondage' : '← Retour au dashboard'"
+                    @back="backFromResults"
                     @poll-loaded="p => resultsPoll = p"
                 />
             </div>

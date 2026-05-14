@@ -4,9 +4,9 @@ import { usePollResults } from '../composables/usePollResults';
 import { usePolling }     from '../composables/usePolling';
 
 const props = defineProps({
-    token:   { type: String, required: true },
-    // true si on vient du dashboard (affiche le bouton retour)
-    hasBack: { type: Boolean, default: false },
+    token:     { type: String, required: true },
+    hasBack:   { type: Boolean, default: false },
+    backLabel: { type: String, default: '← Retour au sondage' },
 });
 const emit = defineEmits(['back', 'poll-loaded']);
 
@@ -46,6 +46,16 @@ function barColor(index) {
         </div>
 
         <template v-else-if="results">
+
+            <!-- Bouton retour -->
+            <button
+                v-if="hasBack"
+                @click="emit('back')"
+                class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500
+                       hover:text-indigo-600 transition-colors duration-150"
+            >
+                {{ backLabel }}
+            </button>
 
             <!-- Box résultats -->
             <div class="bg-white rounded-3xl shadow-md border border-slate-100 p-8 space-y-8">

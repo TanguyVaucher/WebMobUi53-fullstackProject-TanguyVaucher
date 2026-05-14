@@ -30,9 +30,12 @@ function timeLeft(poll) {
     const sec = totalSec % 60;
     const totalMin = Math.floor(totalSec / 60);
     const min = totalMin % 60;
-    const h   = Math.floor(totalMin / 60);
+    const totalH = Math.floor(totalMin / 60);
+    const h   = totalH % 24;
+    const d   = Math.floor(totalH / 24);
     const ss  = String(sec).padStart(2, '0');
-    if (h > 0)       return `Il reste ${h}h ${min} min ${ss} s`;
+    if (d > 0)        return `Il reste ${d}j ${h}h ${min} min`;
+    if (h > 0)        return `Il reste ${h}h ${min} min ${ss} s`;
     if (totalMin > 0) return `Il reste ${min} min ${ss} s`;
     return `Il reste ${ss} s`;
 }
