@@ -213,7 +213,401 @@ Rendu final : au plus tard le dimanche 17 mai 2026 à 23:59:59 UTC (date du comm
 La présentation orale aura lieu lors de la période des examens et sera probablement d'une durée de 20 minutes par étudiant.
 
 -----------------------------------------------------------------------------------------------------
-[WORKSPACE]
+[ARCHITECTURE]
+
+## Architecture retenue
+
+L'interface des sondages sera une SPA Vue.js servie par Laravel.
+Elle sera chargee par `/polls/dashboard` pour la gestion des sondages et par `/polls/vote/{token}`
+pour acceder a un sondage via son lien de partage.
+Cette SPA affichera un seul ecran a la fois : liste, creation, edition, vote ou resultats.
+
+L'application est organisee autour d'une separation simple :
+
+- Laravel sert les pages, garde l'authentification existante et expose une API JSON versionnée.
+- Vue.js gère l'interface des sondages : dashboard, édition, vote et résultats.
+- La base de données relationnelle stocke les utilisateurs, les sondages, les options et les votes.
+- Tailwind pour le style
+
+## Fichiers a modifier / creer
+
+```txt
+app/
+├── Http/Controllers/Api/v1/
+│   └── ApiPollController.php              -> MODIFIER : CRUD, lien token, vote, resultats
+│
+├── Http/Requests/
+│   ├── StorePollRequest.php               -> CREER : validation creation sondage
+│   ├── UpdatePollRequest.php              -> CREER : validation edition sondage
+│   └── StorePollVoteRequest.php           -> CREER : validation vote
+│
+└── Models/
+    ├── Poll.php                           -> MODIFIER legerement : fillable, casts, helpers
+    ├── PollOption.php                     -> MODIFIER legerement si necessaire
+    └── PollVote.php                       -> MODIFIER legerement si necessaire
+```
+
+```txt
+resources/js/
+├── poll-dashboard.js                      -> GARDER : entrypoint existant
+├── AppPollDashboard.vue                   -> MODIFIER : application principale des sondages
+├── components/
+│   ├── PollTable.vue                      -> MODIFIER : liste, statuts, actions
+│   ├── PollEditor.vue                     -> CREER : creation / edition
+│   ├── PollOptionsEditor.vue              -> CREER : ajout / modification / suppression options
+│   ├── PollSettings.vue                   -> CREER : brouillon, lancement, choix multiple, public, duree
+│   ├── PollShareLink.vue                  -> CREER : affichage / copie du lien token
+│   ├── PollVote.vue                       -> CREER : vote simple ou multiple
+│   ├── PollResults.vue                    -> CREER : resultats + graphique simple
+│   └── UserFeedback.vue                   -> CREER SI UTILE : erreurs et messages utilisateur
+│
+└── composables/
+    ├── useFetchApi.js                     -> GARDER : appels JSON existants
+    ├── usePolls.js                        -> CREER : liste, creation, edition, suppression
+    ├── usePollVoting.js                   -> CREER : vote et etat du vote
+    ├── usePollResults.js                  -> CREER : chargement resultats
+    └── usePolling.js                      -> GARDER / ADAPTER : refresh resultats
+```
+
+```txt
+resources/views/polls/
+├── dashboard.blade.php                    -> GARDER : charge l'app Vue en mode dashboard
+└── vote.blade.php                         -> CREER : charge la meme app Vue avec un token
+```
+
+```txt
+routes/
+├── web.php                                -> AJUSTER : /polls/dashboard et /polls/vote/{token}
+└── api.php                                -> MODIFIER : endpoints JSON consommes par Vue
+```
+
+```txt
+README.md                                  -> MODIFIER : installation, lancement, choix techniques
+```
+
+## Endpoints API a exposer
+
+```txt
+GET    /api/v1/polls                       -> liste des sondages du user connecte
+POST   /api/v1/polls                       -> creation d'un sondage
+GET    /api/v1/polls/{poll}                -> detail proprietaire
+PATCH  /api/v1/polls/{poll}                -> edition d'un sondage
+DELETE /api/v1/polls/{poll}                -> suppression d'un sondage
+
+GET    /api/v1/polls/token/{token}         -> affichage via lien partage
+POST   /api/v1/polls/token/{token}/vote    -> vote
+GET    /api/v1/polls/token/{token}/results -> resultats avec polling
+```
+
+## Ecrans internes de la SPA
+
+```txt
+AppPollDashboard.vue
+├── view = "list"       -> PollTable
+├── view = "create"     -> PollEditor vide
+├── view = "edit"       -> PollEditor rempli
+├── view = "vote"       -> PollVote
+└── view = "results"    -> PollResults
+```
+
+## Points de controle
+
+- Travailler principalement dans l'interface Vue servie par `/polls/dashboard`.
+- Utiliser `/polls/vote/{token}` pour le lien public de vote/resultats.
+- Ne pas refaire l'authentification ni la structure generale Laravel.
+- Ajouter seulement les endpoints JSON necessaires au frontend.
+- Garder le backend comme couche de validation, de droits et de persistance.
+- Garantir cote API les regles importantes : proprietaire, brouillon, date de fin, choix unique, resultats publics.
+- Gerer les erreurs utilisateur cote frontend : validation, acces refuse, sondage termine, vote impossible.
+- Afficher les resultats avec polling regulier et graphique simple.
+- Garder une interface Vue propre, lisible et responsive.
+
+-----------------------------------------------------------------------------------------------------
+[PLAN]
+
+## Roadmap
+
+---
+
+### Etape 0 — Exploration et preparation
+
+Avant d'ecrire une seule ligne de code, comprendre ce qui existe deja.
+
+**Lire et comprendre :**
+- `routes/web.php` — quelles routes existent, comment les vues sont servies
+- `routes/api.php` — ce qui est deja expose en JSON
+- `app/Models/Poll.php`, `PollOption.php`, `PollVote.php` — champs, relations, fillable
+- `database/migrations/` — structure exacte des tables (colonnes, types, nullable)
+- `resources/js/poll-dashboard.js` — comment l'app Vue est montee
+- `resources/js/AppPollDashboard.vue` — etat actuel du composant racine
+- `resources/js/composables/useFetchApi.js` — comment les appels API sont faits
+- `resources/views/polls/dashboard.blade.php` — comment la vue Blade charge Vue
+- `README_FRONT.md` — exemples fournis d'integration Vue dans Laravel
+
+**Questions a repondre avant de coder :**
+- Quels champs existent sur `polls` ? (`is_draft`, `secret_token`, `allow_multiple_choices`, `results_public`, `duration`, `started_at`, `ends_at` ou autre ?)
+- `PollVote` contient-il `user_id` + `poll_option_id` ?
+- Le token est-il deja dans le modele ou a creer ?
+- `useFetchApi` gere-t-il le CSRF / les headers JSON automatiquement ?
+- Comment le `user()` authentifie est-il accessible dans les controleurs API ?
+
+---
+
+### Etape 1 — Backend : preparer les modeles
+
+**Fichier : `app/Models/Poll.php`**
+- Verifier et completer le tableau `$fillable` avec tous les champs utiles
+- Ajouter les `$casts` necessaires : booléens (`is_draft`, `allow_multiple_choices`, `results_public`), dates (`started_at`, `ends_at`)
+- Verifier les relations `options()` et `votes()` (HasMany)
+- Ajouter si besoin un helper `isExpired()` ou `isActive()` pour eviter de repeter la logique
+
+**Fichier : `app/Models/PollOption.php`**
+- Verifier `$fillable` (au minimum `label`, `poll_id`)
+- Verifier la relation inverse vers `Poll` (BelongsTo)
+
+**Fichier : `app/Models/PollVote.php`**
+- Verifier `$fillable` (`user_id`, `poll_option_id`, `poll_id` si present)
+- Verifier les relations : `option()` (BelongsTo PollOption), `user()` (BelongsTo User)
+
+---
+
+### Etape 2 — Backend : routes API
+
+**Fichier : `routes/api.php`**
+
+Ajouter les routes dans un groupe `prefix('v1')` avec middleware `auth:sanctum` (ou le middleware auth existant) :
+
+```
+GET    /api/v1/polls
+POST   /api/v1/polls
+GET    /api/v1/polls/{poll}
+PATCH  /api/v1/polls/{poll}
+DELETE /api/v1/polls/{poll}
+```
+
+Et les routes publiques (sans auth obligatoire) :
+```
+GET    /api/v1/polls/token/{token}
+POST   /api/v1/polls/token/{token}/vote       <- auth requise
+GET    /api/v1/polls/token/{token}/results
+```
+
+**Attention :** declarer les routes `/token/{token}` AVANT `/{poll}` dans le fichier pour eviter le conflit de routing Laravel.
+
+**Fichier : `routes/web.php`**
+- Ajouter la route `GET /polls/vote/{token}` qui retourne la vue `polls.vote`
+- Verifier que `GET /polls/dashboard` existe et retourne la bonne vue
+
+---
+
+### Etape 3 — Backend : FormRequests
+
+**Fichier a creer : `app/Http/Requests/StorePollRequest.php`**
+
+Generer avec `php artisan make:request StorePollRequest`.
+Regler `authorize()` a `true`.
+Definir les regles pour : `question` (required, string), `options` (required, array, min:2), `options.*.label` (required, string), `allow_multiple_choices` (boolean), `results_public` (boolean), `duration` (nullable, integer, min:60).
+
+**Fichier a creer : `app/Http/Requests/UpdatePollRequest.php`**
+
+Memes regles que Store, mais tout en `sometimes` (les champs sont optionnels en edition).
+
+**Fichier a creer : `app/Http/Requests/StorePollVoteRequest.php`**
+
+Regle pour : `option_ids` (required, array), `option_ids.*` (exists dans `poll_options`).
+
+---
+
+### Etape 4 — Backend : controleur API
+
+**Fichier : `app/Http/Controllers/Api/v1/ApiPollController.php`**
+
+Implementer les methodes dans cet ordre :
+
+1. **`index`** — retourner les sondages du user connecte avec leurs options (`with('options')`), triees par date desc
+
+2. **`store`** — creer un sondage, generer un `secret_token` unique (`Str::random(32)`), associer le user, sauvegarder les options en masse, retourner 201
+
+3. **`show`** — verifier que le user est bien proprietaire (`$poll->user_id !== auth()->id()` → 403), retourner le sondage avec ses options et ses votes si proprietaire
+
+4. **`update`** — verifier proprietaire, mettre a jour les champs du sondage, synchroniser les options (supprimer les anciennes, inserer les nouvelles), retourner le sondage mis a jour
+
+5. **`destroy`** — verifier proprietaire, supprimer le sondage (et options + votes en cascade si configure), retourner 204
+
+6. **`showByToken`** — trouver le sondage via `secret_token`, verifier qu'il n'est pas brouillon, retourner les donnees publiques (question, options, paramètres mais pas les votes si resultats non publics)
+
+7. **`vote`** — trouver via token, verifier : pas brouillon, pas expire, user authentifie. Pour choix unique : verifier qu'aucun vote de ce user n'existe deja sur ce sondage. Enregistrer le ou les votes. Retourner confirmation.
+
+8. **`results`** — trouver via token, verifier visibilite : si `results_public = false`, seul le proprietaire (authentifie) peut voir. Retourner les options avec le compte de votes pour chacune.
+
+**Regles metier a verifier dans chaque methode cote API (jamais laisser ca qu'au frontend) :**
+- Proprietaire : seul le createur peut modifier/supprimer
+- Brouillon : pas de vote sur un sondage en `is_draft = true`
+- Expire : verifier `ends_at` si defini, refuser si depasse
+- Choix unique : un seul vote par user par sondage
+- Resultats : respecter `results_public`
+
+---
+
+### Etape 5 — Backend : vue Blade pour le vote
+
+**Fichier a creer : `resources/views/polls/vote.blade.php`**
+
+Copier la structure de `dashboard.blade.php` et l'adapter :
+- Charger le meme entrypoint JS (`poll-dashboard.js`)
+- Passer le token en variable JS accessible par Vue (via `@json` ou `data-*` attribute sur le div de montage)
+
+---
+
+### Etape 6 — Frontend : composables
+
+Travailler dans `resources/js/composables/`.
+
+**`useFetchApi.js`** — ne pas modifier, juste comprendre comment l'utiliser (url, method, body).
+
+**`usePolling.js`** — adapter ou creer :
+- Fonction qui prend une callback et un intervalle (ex. 5000ms)
+- Lance `setInterval` au montage
+- Stoppe proprement avec `clearInterval` dans `onUnmounted`
+
+**`usePolls.js`** — creer :
+- `polls` : ref tableau
+- `loading`, `error` : refs
+- `fetchPolls()` : GET `/api/v1/polls`
+- `createPoll(data)` : POST `/api/v1/polls`
+- `updatePoll(id, data)` : PATCH `/api/v1/polls/{id}`
+- `deletePoll(id)` : DELETE `/api/v1/polls/{id}`
+
+**`usePollVoting.js`** — creer :
+- `poll` : ref (le sondage charge via token)
+- `selectedOptions` : ref tableau (ids selectionnes)
+- `hasVoted`, `loading`, `error` : refs
+- `fetchPollByToken(token)` : GET `/api/v1/polls/token/{token}`
+- `submitVote(token)` : POST `/api/v1/polls/token/{token}/vote`
+
+**`usePollResults.js`** — creer :
+- `results` : ref (options avec comptes)
+- `loading`, `error` : refs
+- `fetchResults(token)` : GET `/api/v1/polls/token/{token}/results`
+
+---
+
+### Etape 7 — Frontend : composants
+
+Travailler dans `resources/js/components/`.
+
+Ordre conseille : du plus simple au plus complexe.
+
+**`PollShareLink.vue`**
+- Affiche l'URL de partage construite a partir du `secret_token`
+- Bouton "Copier" (utiliser `navigator.clipboard.writeText`)
+- Props : `token` (string)
+
+**`PollTable.vue`** (modifier l'existant)
+- Affiche la liste des sondages en tableau ou cards
+- Pour chaque sondage : question, statut (brouillon / actif / expire), boutons Editer / Supprimer / Voir resultats / Lien partage
+- Emet : `@create`, `@edit(poll)`, `@delete(poll)`, `@results(poll)`
+
+**`PollOptionsEditor.vue`**
+- Affiche la liste des options actuelles (inputs editables)
+- Bouton "Ajouter une option" (ajoute un champ vide)
+- Bouton supprimer sur chaque option
+- Props : `modelValue` (array d'options), emet `update:modelValue` (v-model compatible)
+
+**`PollSettings.vue`**
+- Checkboxes / toggles pour : `allow_multiple_choices`, `results_public`
+- Input pour `duration` (en secondes ou minutes, a decider)
+- Bouton "Lancer le sondage" (passe `is_draft` a false)
+- Props : `modelValue` (objet settings), emet `update:modelValue`
+
+**`PollEditor.vue`**
+- Formulaire complet de creation / edition
+- Inclut `PollOptionsEditor` et `PollSettings`
+- Gere l'etat local du formulaire
+- A la soumission : appelle `createPoll` ou `updatePoll` selon le contexte
+- Props : `poll` (null si creation, objet si edition)
+- Emet : `@saved(poll)`, `@cancel`
+
+**`PollVote.vue`**
+- Affiche la question et les options sous forme de radios (choix unique) ou checkboxes (choix multiple)
+- Verifie si le sondage est expire → affiche message "Sondage termine"
+- Verifie si l'user a deja vote → affiche message ou desactive le formulaire
+- Bouton "Voter" → appelle `submitVote`
+- Apres vote reussi : emet `@voted`
+- Props : `token` (string)
+
+**`PollResults.vue`**
+- Affiche les resultats avec le nombre de votes par option
+- Graphique simple : barres en pur CSS (largeur = pourcentage) ou avec une lib legere si besoin
+- Rafraichit via `usePolling` + `fetchResults` toutes les 5 secondes
+- Stoppe le polling dans `onUnmounted`
+- Props : `token` (string), `isOwner` (boolean)
+- Emet : `@back`
+
+---
+
+### Etape 8 — Frontend : composant racine et entrypoint
+
+**Fichier : `resources/js/AppPollDashboard.vue`**
+
+- Definir `view` comme `ref('list')` ou `ref('vote')` selon le contexte (dashboard vs lien partage)
+- Detecter si un token est present (via un `data-*` attribute sur le div de montage)
+- Charger les sondages au montage si mode dashboard
+- Gerer les transitions entre vues : `list` → `create` → `edit` → `results`
+- Passer les bons props a chaque composant enfant
+- Ecouter les events pour naviguer entre les vues
+
+**Fichier : `resources/js/poll-dashboard.js`**
+- Verifier que le montage Vue passe bien le token si present dans le DOM
+
+---
+
+### Etape 9 — Verifications et cas limites
+
+Tester manuellement chaque cas :
+
+**Dashboard**
+- [ ] La liste s'affiche correctement
+- [ ] Creer un sondage avec au moins 2 options → apparait en brouillon
+- [ ] Lancer un sondage → statut change
+- [ ] Editer un sondage (question, options, parametres)
+- [ ] Supprimer un sondage → disparait de la liste
+- [ ] Copier le lien de partage → URL correcte
+
+**Vote**
+- [ ] Ouvrir le lien de partage → sondage s'affiche
+- [ ] Voter (choix unique) → confirmation
+- [ ] Voter une seconde fois → refuse (frontend + API)
+- [ ] Ouvrir un sondage en brouillon via token → acces refuse
+- [ ] Ouvrir un sondage expire → message "termine", bouton vote desactive
+
+**Resultats**
+- [ ] Resultats visibles en temps reel (polling)
+- [ ] Graphique s'affiche avec les bons pourcentages
+- [ ] Sondage avec `results_public = false` : resultats visibles seulement par proprietaire
+- [ ] Polling stoppe quand on quitte la vue (verifier dans l'onglet Network que les requetes s'arretent)
+
+**Erreurs utilisateur**
+- [ ] Formulaire incomplet → messages d'erreur clairs
+- [ ] Erreur API (403, 422, 500) → message affiche, pas de crash silencieux
+
+---
+
+### Etape 10 — Finition
+
+**`README.md`**
+- Etapes d'installation (`composer install`, `npm install`, migration, `.env`)
+- Comment lancer le projet (`php artisan serve`, `npm run dev`)
+- Choix techniques : pourquoi une SPA, pourquoi ces composables, quelle lib graphique si utilisee
+
+**Controle de version**
+- Commits reguliers et messages clairs (pas un seul commit a la fin)
+- `.env` non commite, `.env.example` present et a jour
+
+**Relecture finale**
+- Supprimer les `console.log` laisses en debug
+- Verifier que les noms de variables, composants et routes sont coherents
+- S'assurer que chaque composant peut etre explique en 2 phrases a l'oral
 
 -----------------------------------------------------------------------------------------------------
 [CHANGELOG]
@@ -221,3 +615,239 @@ La présentation orale aura lieu lors de la période des examens et sera probabl
 -----------------------------------------------------------------------------------------------------
 [MANIFEST]
 
+## Manifest IA
+
+Ce projet utilise **Vue.js 3** pour l'interface et **Laravel 12.x** pour le backend/API.
+L'IA peut aider a organiser, corriger et verifier, mais le code final doit rester simple, compris,
+relu et defendable a l'oral. Le but est un rendu d'etudiant propre, pas une architecture de SaaS.
+
+## Vue.js 3 - Guidelines frontend
+
+L'interface sondage est une **SPA Vue.js** servie par Laravel. Elle est chargee par `/polls/dashboard`
+pour le dashboard et par `/polls/vote/{token}` pour le lien partage. Elle affiche un seul ecran a la
+fois : liste, creation, edition, vote ou resultats.
+
+### Ce qui est attendu cote Vue
+
+- Utiliser des composants Vue specialises, pas tout mettre dans `AppPollDashboard.vue`.
+- Utiliser des variables reactives : `ref`, `computed`, `watch` si utile.
+- Utiliser les props pour passer les donnees aux enfants.
+- Utiliser les events (`emit`) pour faire remonter les actions au parent.
+- Utiliser des composables pour la logique reutilisable : appels API, CRUD, polling.
+- Gerer les etats utilisateur : chargement, erreur, succes, formulaire invalide.
+- Utiliser Tailwind CSS pour une interface lisible, responsive et mobile first.
+- Rester simple : pas de store Pinia si `ref` + composables suffisent.
+
+### Structure Vue visee
+
+```txt
+resources/js/
+├── poll-dashboard.js                      -> entrypoint existant
+├── AppPollDashboard.vue                   -> racine de la SPA
+├── components/
+│   ├── PollTable.vue                      -> liste + actions rapides
+│   ├── PollEditor.vue                     -> creation / edition
+│   ├── PollOptionsEditor.vue              -> gestion des options
+│   ├── PollSettings.vue                   -> parametres du sondage
+│   ├── PollShareLink.vue                  -> lien de partage
+│   ├── PollVote.vue                       -> vote
+│   └── PollResults.vue                    -> resultats + graphique
+│
+└── composables/
+    ├── useFetchApi.js                     -> appels API existants
+    ├── usePolls.js                        -> CRUD sondages
+    ├── usePollVoting.js                   -> vote
+    ├── usePollResults.js                  -> resultats
+    └── usePolling.js                      -> refresh regulier
+```
+
+### Exemple de composant racine
+
+```vue
+<template>
+  <PollTable
+    v-if="view === 'list'"
+    :polls="polls"
+    @create="openCreate"
+    @edit="openEdit"
+    @results="openResults"
+  />
+
+  <PollEditor
+    v-else-if="view === 'create' || view === 'edit'"
+    :poll="selectedPoll"
+    @saved="backToList"
+    @cancel="backToList"
+  />
+
+  <PollVote
+    v-else-if="view === 'vote'"
+    :poll="selectedPoll"
+    @voted="openResults"
+  />
+
+  <PollResults
+    v-else-if="view === 'results'"
+    :poll="selectedPoll"
+    @back="backToList"
+  />
+</template>
+```
+
+### Exemple de reactivite
+
+```js
+const view = ref('list');
+const polls = ref([]);
+const selectedPoll = ref(null);
+const loading = ref(false);
+const error = ref(null);
+
+const isEditing = computed(() => view.value === 'edit');
+```
+
+### Exemple d'appel API
+
+```js
+const { fetchApi } = useFetchApi();
+
+async function loadPolls() {
+  loading.value = true;
+  error.value = null;
+
+  try {
+    polls.value = await fetchApi({ url: '/polls' });
+  } catch (err) {
+    error.value = err.message || 'Impossible de charger les sondages.';
+  } finally {
+    loading.value = false;
+  }
+}
+```
+
+### Exemple props / events
+
+```vue
+<script setup>
+defineProps({
+  polls: { type: Array, default: () => [] },
+});
+
+const emit = defineEmits(['create', 'edit', 'delete']);
+</script>
+```
+
+## Laravel 12.x - Guidelines backend
+
+Laravel sert la page Vue, conserve l'authentification existante et expose l'API JSON. On ne refait pas
+le projet Laravel : on ajoute seulement ce dont la SPA a besoin.
+
+### Ce qui est attendu cote Laravel
+
+- Utiliser Laravel **12.x**.
+- Garder l'authentification Laravel/Sanctum existante.
+- Garder une API JSON versionnee en `/api/v1`.
+- Valider les donnees avec des `FormRequest` quand c'est utile.
+- Utiliser les relations Eloquent fournies : `Poll`, `PollOption`, `PollVote`, `User`.
+- Retourner des reponses JSON claires, avec les bons codes HTTP.
+- Verifier les regles importantes cote API, pas seulement cote Vue.
+- Rester proche du style du projet : controleurs simples, routes lisibles, Eloquent classique.
+
+### Exemple controller API Laravel 12
+
+```php
+public function index(Request $request)
+{
+    return $request->user()
+        ->polls()
+        ->with('options')
+        ->latest()
+        ->get();
+}
+```
+
+```php
+public function store(StorePollRequest $request)
+{
+    $poll = new Poll($request->validated());
+    $poll->user()->associate($request->user());
+    $poll->secret_token = Str::random(32);
+    $poll->save();
+
+    return response()->json($poll->load('options'), 201);
+}
+```
+
+### Exemple validation FormRequest
+
+```php
+public function rules(): array
+{
+    return [
+        'question' => ['required', 'string', 'max:255'],
+        'options' => ['required', 'array', 'min:2'],
+        'options.*.label' => ['required', 'string', 'max:255'],
+        'allow_multiple_choices' => ['boolean'],
+        'results_public' => ['boolean'],
+        'duration' => ['nullable', 'integer', 'min:60'],
+    ];
+}
+```
+
+### Exemple relations Eloquent
+
+```php
+public function options(): HasMany
+{
+    return $this->hasMany(PollOption::class);
+}
+
+public function votes(): HasMany
+{
+    return $this->hasMany(PollVote::class);
+}
+```
+
+### Exemple erreur JSON
+
+```php
+if ($poll->is_draft) {
+    return response()->json([
+        'message' => 'Ce sondage est encore en brouillon.',
+    ], 403);
+}
+```
+
+## Regles metier a verifier cote API
+
+- Un utilisateur ne peut modifier ou supprimer que ses propres sondages.
+- Un sondage en brouillon ne peut pas recevoir de vote.
+- Un sondage termine ne peut plus recevoir de vote.
+- Un sondage a choix unique accepte une seule option par utilisateur.
+- Les resultats ne sont visibles que si `results_public = true` ou si l'utilisateur est proprietaire.
+
+## Utilisation correcte de l'IA
+
+- Utiliser l'IA pour clarifier, corriger, verifier, simplifier.
+- Relire chaque morceau de code avant de le garder.
+- Garder uniquement du code que je peux expliquer.
+- Ecrire les commentaires moi-meme autant que possible, puis faire corriger si besoin.
+- En cas de doute, choisir une solution simple et explicable.
+
+## A ne pas faire
+
+- Ne pas refaire l'authentification.
+- Ne pas remplacer Laravel par une logique uniquement frontend.
+- Ne pas creer plusieurs apps Vue si une SPA suffit.
+- Ne pas ajouter de librairie externe sans besoin clair.
+- Ne pas garder du code IA impossible a expliquer a l'oral.
+
+## Ce que je dois maitriser pour l'oral
+
+- Pourquoi `/polls/dashboard` sert au dashboard et `/polls/vote/{token}` au lien partage.
+- Comment `AppPollDashboard.vue` choisit l'ecran affiche.
+- Comment `ref`, `computed`, props et events sont utilises.
+- Pourquoi les appels API sont places dans des composables.
+- Quels endpoints `/api/v1/polls` sont appeles par le frontend.
+- Comment les relations `Poll`, `PollOption`, `PollVote`, `User` fonctionnent.
+- Ou sont verifiees les regles importantes : proprietaire, brouillon, fin, choix unique, resultats publics.
