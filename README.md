@@ -1,77 +1,96 @@
-# HEIG-VD DévProdMéd Course - Mini-projet
+# Module de sondages - Tanguy Vaucher
 
-Ce dépôt contient le mini-projet à réaliser dans le cadre du cours
-_"[Développement de produit média (DévProdMéd)](https://github.com/heig-vd-devprodmed-course/heig-vd-devprodmed-course)"_
-enseigné à la
-[Haute Ecole d'Ingénierie et de Gestion du Canton de Vaud (HEIG-VD)](https://heig-vd.ch),
-Suisse.
+Ce dépôt est basé sur le mini-projet Laravel de Monsieur Ludovic Delafontaine, réalisé dans le cadre du cours DevProdMéd à la HEIG-VD.
 
-## Objectif du mini-projet
+Le projet de base est une application Laravel de type réseau social. Dans ce rendu, un module de sondages a été ajouté avec une interface frontend en Vue.js. Ce module permet de créer, configurer, partager, voter et consulter les résultats de sondages depuis une interface intégrée à Laravel.
 
-L'objectif de ce mini-projet est de créer un réseau social simple en utilisant le
-framework [Laravel](https://laravel.com/). Ce projet permettra de mettre en pratique les concepts
-appris dans le cours.
+Une attention particulière a été donnée à l'architecture frontend, aux choix techniques, à la lisibilité du code et à l'expérience utilisateur (UX/UI). L'affichage est conçu pour un affichage desktop, le responsive n'est pas pris en charge.
 
-## Pré-requis
+## Technologies utilisées
 
-Afin de lancer ce projet, une stack compatible avec Laravel, est requise.
+- Backend : Laravel 12
+- Utilisation du système d'authentification existante et de l'API JSON
+- Vue.js 3 pour l'interface du module de sondages
+- Vite pour la compilation des assets frontend
+- Tailwind CSS pour le style et l'interface responsive
+- SQLite par défaut pour la base de données locale
+- Laravel Sanctum pour l'authentification des appels API
 
-Voici les pré-requis nécessaires :
+## Architecture du module de sondages
 
-- PHP >= 8.0.
-- Composer.
-- Node.js et npm.
-- Une base de données (MySQL, PostgreSQL, SQLite, etc.).
-- Un serveur web (Apache, Nginx, etc.).
+Le module de sondages est chargé depuis Laravel, puis géré côté frontend par une application Vue.
 
-[Laravel Herd](https://helm.sh/docs/charts/laravel/) est recommandé pour une installation facile de Laravel et de ses dépendances.
+Les pages principales sont :
 
-## Développement local
+- `/polls/dashboard` : tableau de bord des sondages de l'utilisateur connecté
+- `/polls/vote/{token}` : page de vote accessible via un lien de partage
 
-Pour développer et tester le mini-projet en local, voici les étapes à suivre :
+Le frontend consomme une API JSON versionnée sous `/api/v1/polls`. Les appels API permettent de gérer les sondages, les options, le vote et les résultats.
 
-1. Forker ce dépôt
+Le code Vue est découpé en composants et composables :
 
-2. Installer les dépendances avec npm et Composer :
+- composants pour le tableau de bord, l'édition, les options, les paramètres, le vote et les résultats
+- composables pour les appels API, le CRUD des sondages, le vote, les résultats et le polling
 
-    ```bash
-    npm install && npm run build
+## Utilisation des IA
 
-    composer install
-    ```
+Des outils d'IA, principalement Claude et Codex, ont été utilisés comme aide au développement.
 
-3. Copier le fichier `.env.example` en `.env`.
-4. Modifier les variables d'environnement si nécessaire (optionnel).
-5. Générer la clé d'application Laravel :
+Ils ont servi pour :
 
-    ```bash
-    php artisan key:generate
-    ```
+- la planification de l'architecture
+- l'aide à l'écriture de certaines parties du code
+- La correction des commentaires
+- l'aide à la conception de l'interface avec Tailwind CSS
+- La correction de problèmes techniques
 
-6. Créer le lien symbolique pour les fichiers téléversés :
+## Installation
 
-    ```bash
-    php artisan storage:link
-    ```
+Installer les dépendances :
 
-7. Créer la base de données et exécuter les migrations :
+```bash
+composer install
+npm install
+```
 
-    ```bash
-    php artisan migrate
-    ```
+Créer le fichier d'environnement :
 
-    S'il est nécessaire de réinitialiser la base de données, utiliser la commande `php artisan migrate:reset` puis `php artisan migrate` à nouveau.
+```bash
+cp .env.example .env
+```
 
-8. Optionnel : en mode développement, il est possible de peupler la base de données avec des données fictives :
+Générer la clé Laravel :
 
-    ```bash
-    php artisan db:seed
-    ```
+```bash
+php artisan key:generate
+```
 
-9. Démarrer le serveur de développement Laravel :
+Préparer la base de données :
 
-    ```bash
-    composer run dev
-    ```
+```bash
+touch database/database.sqlite
+php artisan migrate
+php artisan db:seed
+```
 
-L'application sera accessible à l'adresse <http://localhost:8000>.
+## Lancement du projet
+
+Lancer le projet :
+
+```bash
+composer run dev
+```
+
+L'application est ensuite accessible à l'adresse :
+
+```txt
+http://127.0.0.1:8000
+http://127.0.0.1:8000/polls/dashboard
+```
+
+## Accès au compte avec des polls
+
+Pour accéder à un compte de test avec des sondages déjà créés, utiliser :
+
+- Email : `test@full.poll`
+- Mot de passe : `Pwd123456789`
