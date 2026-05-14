@@ -1,4 +1,4 @@
-[CONSIGNES]
+[CONSIGNE]
 
 # Travail pratique : Créer une application de sondage (Laravel + Vue.js)
 
