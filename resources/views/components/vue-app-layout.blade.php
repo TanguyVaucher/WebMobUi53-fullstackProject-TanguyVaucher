@@ -18,6 +18,7 @@
         <title>{{ config('app.name') }}</title>
     @endisset
 
+    <link rel="icon" type="image/png" href="/favicon.png">
     @vite(['resources/css/app.css'])
     @isset($scripts)
         {{ $scripts }}

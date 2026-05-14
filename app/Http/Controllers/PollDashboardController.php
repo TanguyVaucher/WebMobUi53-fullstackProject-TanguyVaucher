@@ -11,7 +11,8 @@ class PollDashboardController extends Controller
         $polls = $request->user()->polls()->orderBy('created_at', 'desc')->get();
 
         return view('polls.dashboard', [
-            'polls' => $polls,
+            'polls'    => $polls,
+            'username' => $request->user()->username,
         ]);
     }
 }

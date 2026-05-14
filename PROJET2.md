@@ -612,6 +612,58 @@ Tester manuellement chaque cas :
 -----------------------------------------------------------------------------------------------------
 [CHANGELOG]
 
+## 2026-05-14 — Implémentation complète du module poll
+
+### Backend — fichiers modifiés
+
+| Fichier | Action | Détail |
+|---|---|---|
+| `app/Models/Poll.php` | Modifié | Ajout `$fillable`, `$casts` (booléens + dates), helpers `isExpired()` et `isActive()` |
+| `app/Models/PollOption.php` | Modifié | Ajout `$fillable = ['poll_id', 'label']` |
+| `app/Models/PollVote.php` | Modifié | Ajout `$fillable = ['poll_id', 'user_id', 'poll_option_id']` |
+| `app/Http/Controllers/Api/v1/ApiPollController.php` | Modifié | Réécriture complète : `index`, `store`, `show`, `update`, `destroy`, `showByToken`, `vote`, `results` avec toutes les règles métier |
+| `routes/api.php` | Modifié | Ajout des 8 endpoints `/api/v1/polls/...` (token déclaré avant `/{poll}` pour éviter le conflit de routing) |
+| `routes/web.php` | Modifié | Ajout `GET /polls/vote/{token}` → vue `polls.vote` |
+
+### Backend — fichiers créés
+
+| Fichier | Détail |
+|---|---|
+| `app/Http/Requests/StorePollRequest.php` | Validation création : question, options (min 2), paramètres booléens, duration |
+| `app/Http/Requests/UpdatePollRequest.php` | Même règles en `sometimes` (champs optionnels à l'édition) |
+| `app/Http/Requests/StorePollVoteRequest.php` | Validation vote : `option_ids[]` avec existence en base |
+| `resources/views/polls/vote.blade.php` | Vue Blade pour le lien de partage, charge le même entrypoint Vue avec `token` en prop |
+
+### Frontend — fichiers modifiés
+
+| Fichier | Détail |
+|---|---|
+| `resources/js/AppPollDashboard.vue` | Réécriture : SPA router (`view` ref), détection token, navigation entre list/create/edit/vote/results, card glassmorphisme |
+| `resources/js/components/PollTable.vue` | Réécriture : cards avec badge statut (Brouillon/Actif/Terminé), actions éditer/supprimer/résultats, lien de partage intégré |
+
+### Frontend — fichiers créés
+
+| Fichier | Détail |
+|---|---|
+| `resources/js/composables/usePolls.js` | CRUD sondages : `fetchPolls`, `createPoll`, `updatePoll`, `deletePoll`, mise à jour liste locale |
+| `resources/js/composables/usePollVoting.js` | Charge sondage par token, gère `selectedOptions`, `submitVote`, `toggleOption` (radio/checkbox) |
+| `resources/js/composables/usePollResults.js` | `fetchResults(token)`, utilisé avec `usePolling` pour le refresh automatique |
+| `resources/js/components/PollEditor.vue` | Formulaire création/édition : intègre PollOptionsEditor + PollSettings + PollShareLink, validation front |
+| `resources/js/components/PollOptionsEditor.vue` | Ajout/modif/suppression options (compatible `v-model`, min 2 options) |
+| `resources/js/components/PollSettings.vue` | Toggles : choix multiple, résultats publics, modifier vote, durée en minutes, bouton Lancer |
+| `resources/js/components/PollShareLink.vue` | Affiche l'URL de partage, bouton Copier (`navigator.clipboard`) |
+| `resources/js/components/PollVote.vue` | Interface vote : radio/checkbox selon paramètre, états expiré/déjà voté, erreurs API |
+| `resources/js/components/PollResults.vue` | Résultats : barres CSS animées avec pourcentages, polling automatique toutes les 5s, badge Live |
+
+### Règles métier implémentées côté API
+
+- Propriétaire : seul le créateur peut modifier/supprimer son sondage (403 sinon)
+- Brouillon : aucun vote accepté si `is_draft = true`
+- Expiré : aucun vote accepté si `ends_at` est dépassé
+- Choix unique : un seul `option_id` autorisé, un seul vote par user par sondage
+- Vote modifiable : suppression de l'ancien vote si `allow_vote_change = true`
+- Résultats : visibles uniquement si `results_public = true` ou si propriétaire
+
 -----------------------------------------------------------------------------------------------------
 [MANIFEST]
 

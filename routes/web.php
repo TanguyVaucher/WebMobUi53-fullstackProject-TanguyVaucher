@@ -35,6 +35,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/polls/dashboard', PollDashboardController::class)->name('polls.dashboard');
     Route::get('/polls/dashboard-integrated', fn() => view('polls.dashboard-integrated'))
         ->name('polls.dashboard-integrated');
+    // Page de vote accessible via le lien de partage (auth requise pour voter)
+    Route::get('/polls/vote/{token}', fn(string $token) => view('polls.vote', ['token' => $token]))
+        ->name('polls.vote');
     Route::resource('posts', PostController::class)->except(['index', 'show']);
     Route::singleton('my-profile', MyProfileController::class)->destroyable();
     Route::match(['put', 'patch'], '/likes/{post}', [LikeController::class, 'update']);
