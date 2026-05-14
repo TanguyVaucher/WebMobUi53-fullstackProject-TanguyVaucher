@@ -1,4 +1,4 @@
-# Module de sondages - Tanguy Vaucher
+# Module de sondages - Par Tanguy Vaucher
 
 Ce dépôt est basé sur le mini-projet Laravel de Monsieur Ludovic Delafontaine, réalisé dans le cadre du cours DevProdMéd à la HEIG-VD.
 
