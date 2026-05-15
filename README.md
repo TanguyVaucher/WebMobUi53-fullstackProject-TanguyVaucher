@@ -111,8 +111,11 @@ L'application est ensuite accessible à l'adresse :
 
 ```txt
 http://127.0.0.1:8000
+http://127.0.0.1:8000/auth/login
 http://127.0.0.1:8000/polls/dashboard
 ```
+
+Il faut d'abord se connecter via `/auth/login`, puis ouvrir `/polls/dashboard`.
 
 ## Accès au compte avec des polls
 
