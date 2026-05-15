@@ -40,6 +40,12 @@ function timeLeft(poll) {
     return `Il reste ${ss} s`;
 }
 
+function canShare(poll) {
+    return !poll.is_draft
+        && poll.secret_token
+        && (!poll.ends_at || new Date(poll.ends_at) > now.value);
+}
+
 // Génère un style de header unique par card :
 // - avec thème  → dégradé animé, vitesse + délai + angle uniques basés sur l'id
 // - sans thème  → gris neutre (anciens sondages sans couleur définie)
@@ -128,8 +134,8 @@ function headerStyle(poll) {
                     </p>
 
 
-                    <!-- Lien partage si sondage actif -->
-                    <div v-if="!poll.is_draft && poll.secret_token" class="mt-1 mb-3" @click.stop>
+                    <!-- Lien partage si sondage actif et non terminé -->
+                    <div v-if="canShare(poll)" class="mt-1 mb-3" @click.stop>
                         <PollShareLink :token="poll.secret_token" />
                     </div>
                 </div>

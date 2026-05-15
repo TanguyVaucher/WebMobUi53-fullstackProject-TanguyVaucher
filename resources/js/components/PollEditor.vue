@@ -74,9 +74,13 @@ const previewStyle = computed(() => {
 });
 
 async function onDepublish() {
-    if (!props.poll?.id) return;
+    if (!props.poll?.id) {
+        settings.value = { ...settings.value, is_draft: true };
+        return;
+    }
+
     await updatePoll(props.poll.id, { is_draft: true });
-    settings.value.is_draft = true;
+    settings.value = { ...settings.value, is_draft: true };
 }
 
 async function submit() {

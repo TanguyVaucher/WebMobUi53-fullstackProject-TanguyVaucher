@@ -1,5 +1,4 @@
 <script setup>
-import { computed } from 'vue';
 import PollShareLink from './PollShareLink.vue';
 
 const props = defineProps({
@@ -13,6 +12,12 @@ function statusOf(poll) {
     if (poll.is_draft) return { label: 'Brouillon', style: 'bg-amber-50 text-amber-600 border-amber-100' };
     if (poll.ends_at && new Date(poll.ends_at) < new Date()) return { label: 'Terminé', style: 'bg-slate-100 text-slate-500 border-slate-200' };
     return { label: 'Actif', style: 'bg-emerald-50 text-emerald-600 border-emerald-100' };
+}
+
+function canShare(poll) {
+    return !poll.is_draft
+        && poll.secret_token
+        && (!poll.ends_at || new Date(poll.ends_at) > new Date());
 }
 </script>
 
@@ -89,12 +94,11 @@ function statusOf(poll) {
                     </div>
                 </div>
 
-                <!-- Lien de partage (visible uniquement si sondage lancé) -->
-                <div v-if="!poll.is_draft && poll.secret_token" class="mt-3">
+                <!-- Lien de partage (visible uniquement si sondage lancé et non terminé) -->
+                <div v-if="canShare(poll)" class="mt-3">
                     <PollShareLink :token="poll.secret_token" />
                 </div>
             </div>
         </div>
     </div>
 </template>
-
