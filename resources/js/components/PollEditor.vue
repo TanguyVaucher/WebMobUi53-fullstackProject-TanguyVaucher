@@ -124,10 +124,10 @@ async function submit() {
 
         <form @submit.prevent="submit">
             <div class="bg-white border border-slate-100 overflow-hidden" style="border-radius: 28px; box-shadow: 0 8px 40px 0 rgba(0,0,0,0.06)">
-            <div class="grid grid-cols-2 gap-0 items-stretch">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-0 items-stretch">
 
                 <!-- ── Colonne gauche : question + couleur + options ── -->
-                <div class="space-y-6 px-8 py-8 border-r border-slate-200">
+                <div class="space-y-6 px-5 sm:px-8 py-6 sm:py-8 border-b lg:border-b-0 lg:border-r border-slate-200">
 
                     <!-- Question — champ géant -->
                     <div class="relative">
@@ -144,7 +144,7 @@ async function submit() {
                             type="text"
                             placeholder="Quelle est votre question ?"
                             @input="emit('question-change', question)"
-                            class="w-full rounded-2xl pl-[72px] pr-6 py-5 text-3xl font-semibold
+                            class="w-full rounded-2xl pl-[60px] sm:pl-[72px] pr-4 sm:pr-6 py-4 sm:py-5 text-2xl sm:text-3xl font-semibold
                                    tracking-tight placeholder:opacity-80 outline-none"
                             :style="{ ...questionStyle, color: questionIconColor }"
                             @focus="questionFocused = true"
@@ -195,7 +195,7 @@ async function submit() {
                 </div>
 
                 <!-- ── Colonne droite : paramètres + partage + soumettre ── -->
-                <div class="space-y-6 px-8 py-8">
+                <div class="space-y-6 px-5 sm:px-8 py-6 sm:py-8">
 
                     <!-- Paramètres -->
                     <div class="rounded-2xl border border-slate-100 bg-slate-100/60 px-4 py-4">

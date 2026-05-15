@@ -90,7 +90,7 @@ const themeTextStyle = computed(() => themeC.value ? { color: themeC.value.solid
         <template v-else-if="poll">
             <!-- En-tête — titre pleine largeur viewport (breakout du conteneur max-w-lg) -->
             <div style="position: relative; left: 50%; transform: translateX(-50%); width: calc(100vw - 20px); padding-bottom: 15px;">
-                <h2 class="text-7xl font-black tracking-tight text-center"
+                <h2 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-center"
                     :style="[
                         { maxWidth: '700px', margin: '0 auto', lineHeight: '1.08', wordBreak: 'break-word' },
                         questionGradientStyle.background ? questionGradientStyle : { color: '#0f172a' }

@@ -90,9 +90,7 @@ function headerStyle(poll) {
             </button>
         </div>
 
-        <!-- Grille 4 colonnes fixes, chaque card = ~25vw -->
-        <div v-else class="grid gap-6"
-             style="grid-template-columns: repeat(4, 1fr)">
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
 
             <div
                 v-for="poll in polls"

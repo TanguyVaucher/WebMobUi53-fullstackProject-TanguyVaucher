@@ -4,12 +4,12 @@ Ce dépôt est basé sur le mini-projet Laravel de Monsieur Ludovic Delafontaine
 
 Le projet de base est une application Laravel de type réseau social. Dans ce rendu, un module de sondages a été ajouté avec une interface frontend en Vue.js. Ce module permet de créer, configurer, partager, voter et consulter les résultats de sondages depuis une interface intégrée à Laravel.
 
-Une attention particulière a été donnée à l'architecture frontend, aux choix techniques, à la lisibilité du code et à l'expérience utilisateur (UX/UI). L'affichage est conçu pour un affichage desktop, le responsive n'est pas pris en charge.
+Une attention particulière a été donnée à l'architecture frontend, aux choix techniques, à la lisibilité du code et à l'expérience utilisateur (UX/UI). L'interface est utilisable sur mobile, tablette et desktop.
 
 ## Technologies utilisées
 
 - Backend : Laravel 12
-- Utilisation du système d'authentification existante et de l'API JSON
+- Utilisation du système d'authentification existant et de l'API JSON
 - Vue.js 3 pour l'interface du module de sondages
 - Vite pour la compilation des assets frontend
 - Tailwind CSS pour le style et l'interface responsive
@@ -31,6 +31,32 @@ Le code Vue est découpé en composants et composables :
 
 - composants pour le tableau de bord, l'édition, les options, les paramètres, le vote et les résultats
 - composables pour les appels API, le CRUD des sondages, le vote, les résultats et le polling
+
+## Fonctionnalités implémentées
+
+- Affichage des sondages de la personne connectée dans un dashboard
+- Création, modification, suppression et publication d'un sondage
+- Gestion dynamique des options de réponse
+- Configuration du mode brouillon, du choix unique ou multiple, de la visibilité des résultats et de la durée
+- Génération et copie d'un lien de partage contenant le token du sondage
+- Page de vote accessible via le token
+- Vote réservé aux personnes authentifiées
+- Consultation des résultats publics sans authentification
+- Blocage du vote lorsque la date de fin est dépassée
+- Affichage des résultats avec polling régulier et graphique en barres
+- Garantie côté frontend et API qu'un sondage à choix unique ne reçoit qu'un seul choix par vote
+- Bonus : possibilité d'autoriser la modification d'un vote déjà soumis
+
+## Endpoints principaux
+
+- `GET /api/v1/polls` : liste des sondages de la personne connectée
+- `POST /api/v1/polls` : création d'un sondage
+- `GET /api/v1/polls/{poll}` : détail d'un sondage appartenant à la personne connectée
+- `PATCH /api/v1/polls/{poll}` : modification d'un sondage
+- `DELETE /api/v1/polls/{poll}` : suppression d'un sondage
+- `GET /api/v1/polls/token/{token}` : affichage d'un sondage via son token
+- `POST /api/v1/polls/token/{token}/vote` : soumission d'un vote authentifié
+- `GET /api/v1/polls/token/{token}/results` : consultation des résultats si publics ou propriétaire
 
 ## Utilisation des IA
 

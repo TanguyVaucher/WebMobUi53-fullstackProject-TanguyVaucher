@@ -99,11 +99,11 @@ function onVoted() {
     <div class="h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 overflow-hidden">
 
         <!-- ─── Header fixe ─────────────────────────────────────────── -->
-        <header class="shrink-0 flex items-center justify-between px-6 py-4
+        <header class="shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 py-4
                         border-b border-slate-100 bg-white/70 backdrop-blur-md">
 
             <!-- Gauche : logo + titre de la vue -->
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 w-full sm:w-auto min-w-0">
                 <!-- Bouton retour si pas sur la liste -->
                 <button
                     v-if="view !== 'list' && (!props.token || view === 'results')"
@@ -118,7 +118,7 @@ function onVoted() {
 
                 <div>
                     <!-- Titre dynamique selon la vue -->
-                    <h1 class="text-3xl font-semibold tracking-tight leading-tight flex items-center gap-2" style="margin-top: -4px">
+                    <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight leading-tight flex items-center gap-2 min-w-0" style="margin-top: -4px">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-indigo-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                             <polyline points="14 2 14 8 20 8"/>
@@ -134,13 +134,13 @@ function onVoted() {
 
                         <!-- Édition : titre du sondage -->
                         <template v-else-if="view === 'edit'">
-                            <span style="color: rgba(0,0,0,0.8)">Modifier :</span><span class="text-indigo-500 truncate max-w-xl"> {{ liveQuestion }}</span>
+                            <span style="color: rgba(0,0,0,0.8)">Modifier :</span><span class="text-indigo-500 truncate max-w-[14rem] sm:max-w-xl"> {{ liveQuestion }}</span>
                         </template>
 
                         <!-- Résultats : "Résultats pour <question>" -->
                         <template v-else-if="view === 'results'">
                             <span class="text-slate-900/80">Résultats pour </span>
-                            <span class="text-indigo-500 truncate max-w-xl">{{ resultsPoll?.question ?? '...' }}</span>
+                            <span class="text-indigo-500 truncate max-w-[14rem] sm:max-w-xl">{{ resultsPoll?.question ?? '...' }}</span>
                         </template>
 
                         <!-- Autres vues -->
@@ -156,7 +156,7 @@ function onVoted() {
             <button
                 v-if="view === 'list'"
                 @click="openCreate"
-                class="rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white
+                class="w-full sm:w-auto rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white
                        font-bold px-4 py-2 text-sm transition-all duration-150
                        shadow-sm shadow-indigo-200"
             >
@@ -196,8 +196,8 @@ function onVoted() {
 
             <!-- Éditeur dans un conteneur centré + padding -->
             <div v-else-if="view === 'create' || view === 'edit'"
-                 class="min-h-full flex items-center" style="margin-top: -40px">
-            <div class="max-w-6xl w-full mx-auto px-8 py-8">
+                 class="min-h-full flex items-center lg:-mt-10">
+            <div class="max-w-6xl w-full mx-auto px-4 sm:px-8 py-6 sm:py-8">
                 <PollEditor
                     :poll="selectedPoll"
                     @saved="onSaved"

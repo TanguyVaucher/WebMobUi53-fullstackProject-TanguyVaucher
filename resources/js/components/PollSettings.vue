@@ -76,9 +76,9 @@ const multiplier = ref(1);
 
         <!-- Durée en minutes -->
         <div class="space-y-2">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <span class="text-base font-medium text-slate-700">Durée (en min)</span>
-                <div class="flex items-center gap-1.5">
+                <div class="flex items-center gap-1.5 flex-wrap">
                     <!-- Multiplicateur chevrons -->
                     <div class="flex flex-col items-center">
                         <button type="button" @click="multiplier = Math.min(9, multiplier + 1)"
