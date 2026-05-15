@@ -1,15 +1,5 @@
 # CHANGELOG
 
-Historique complet de toutes les modifications apportées au projet depuis sa création,
-classées chronologiquement (du plus ancien au plus récent), séparées par couche technique,
-et mises en regard des critères de PROJET2.md.
-
----
-
-## 23740de — Initial commit _(socle de départ)_
-
-> Projet Laravel fourni par le professeur. Aucun code étudiant.
-
 ### Backend — Fichiers créés
 | Fichier | Rôle |
 |---|---|
