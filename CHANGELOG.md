@@ -1,5 +1,48 @@
 # CHANGELOG
 
+## Résumé
+
+### Backend — Fichiers créés
+- `app/Http/Requests/StorePollRequest.php` — validation de création d'un sondage
+- `app/Http/Requests/StorePollVoteRequest.php` — validation de soumission d'un vote
+- `app/Http/Requests/UpdatePollRequest.php` — validation de modification d'un sondage
+- `database/migrations/2026_05_14_141349_add_color_to_polls_table.php` — ajout d'une couleur de thème aux sondages
+
+### Backend — Fichiers modifiés
+- `app/Http/Controllers/Api/v1/ApiPollController.php` — endpoints JSON des sondages, votes et résultats
+- `app/Http/Controllers/PollDashboardController.php` — données passées à la vue dashboard
+- `app/Models/Poll.php` — champs remplissables, casts et helpers d'état
+- `app/Models/PollOption.php` — champs remplissables des options
+- `app/Models/PollVote.php` — champs remplissables des votes
+- `database/seeders/DatabaseSeeder.php` — données de démonstration pour tester les sondages
+- `routes/api.php` — routes API versionnées pour les sondages
+- `routes/web.php` — routes web du dashboard et du lien de vote
+- `tests/Pest.php` — configuration Pest adaptée au projet
+
+### Frontend — Fichiers créés
+- `public/favicon.png` — icône du site
+- `public/logo.png` — logo de l'application
+- `resources/js/components/PollEditor.vue` — formulaire de création et édition
+- `resources/js/components/PollGrid.vue` — affichage responsive des sondages
+- `resources/js/components/PollOptionsEditor.vue` — gestion des options de réponse
+- `resources/js/components/PollResults.vue` — affichage des résultats et du graphique
+- `resources/js/components/PollSettings.vue` — réglages du sondage
+- `resources/js/components/PollShareLink.vue` — affichage et copie du lien de partage
+- `resources/js/components/PollVote.vue` — interface de vote
+- `resources/js/composables/usePollResults.js` — chargement des résultats
+- `resources/js/composables/usePollVoting.js` — chargement du vote et soumission
+- `resources/js/composables/usePolls.js` — CRUD frontend des sondages
+- `resources/js/utils/pollColors.js` — couleurs disponibles pour les sondages
+- `resources/views/polls/vote.blade.php` — page Blade du lien de vote
+
+### Frontend — Fichiers modifiés
+- `resources/js/AppPollDashboard.vue` — application Vue principale des sondages
+- `resources/js/components/PollTable.vue` — liste et actions rapides des sondages
+- `resources/views/components/vue-app-layout.blade.php` — layout Blade pour les apps Vue
+- `resources/views/polls/dashboard.blade.php` — page Blade du dashboard Vue
+
+--------------------------------------------------------------------------------------------------------
+
 ### Backend — Fichiers créés
 | Fichier | Rôle |
 |---|---|

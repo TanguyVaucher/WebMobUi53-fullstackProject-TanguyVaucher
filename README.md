@@ -6,6 +6,8 @@ Le projet de base est une application Laravel de type réseau social. Dans ce re
 
 Une attention particulière a été donnée à l'architecture frontend, aux choix techniques, à la lisibilité du code et à l'expérience utilisateur (UX/UI). L'interface est utilisable sur mobile, tablette et desktop.
 
+Les changements apportés au projet sont référencés dans le fichier `CHANGELOG.md`
+
 ## Technologies utilisées
 
 - Backend : Laravel 12
