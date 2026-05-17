@@ -14,10 +14,10 @@ const props = defineProps({
 
 const { polls, loading, error, fetchPolls, deletePoll, updatePoll } = usePolls();
 
+// App.vue principale
+
 // Question du sondage affiché en résultats (reçue depuis PollResults une fois chargé)
 const resultsPoll = ref(null);
-
-// Image dans public/ — référencée comme string pour éviter que Vite la bundle
 
 // Vue active — "list" | "create" | "edit" | "vote" | "results"
 const view         = ref(props.token ? 'vote' : 'list');

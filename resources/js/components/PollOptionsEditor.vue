@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-// Composant d'édition des options — compatible v-model
+// Composant d'édition des options - compatible v-model
 const props = defineProps({
     modelValue:  { type: Array,  default: () => [] },
     accentColor: { type: String, default: '#818cf8' }, // couleur du thème actif
@@ -58,7 +58,7 @@ function removeOption(index) {
                 }"
             />
 
-            <!-- Bouton supprimer — désactivé si < 3 options -->
+            <!-- Bouton supprimer - désactivé si < 3 options -->
             <button
                 type="button"
                 @click="removeOption(i)"
