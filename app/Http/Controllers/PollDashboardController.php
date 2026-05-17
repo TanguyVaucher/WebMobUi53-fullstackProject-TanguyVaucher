@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+// Récupère les sondages de l'utilisateur connecté pour le tableau de bord
+
 class PollDashboardController extends Controller
 {
     public function __invoke(Request $request)

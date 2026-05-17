@@ -23,7 +23,7 @@ class StorePollRequest extends FormRequest
             'results_public'         => ['boolean'],
             // duration en secondes, min 1 minute
             'duration'               => ['nullable', 'integer', 'min:60'],
-            // thème couleur optionnel
+            // thème couleur
             'color'                  => ['nullable', 'string', 'in:indigo,violet,sky,teal,pink,orange'],
             // on peut lancer le sondage directement à la création
             'is_draft'               => ['boolean'],

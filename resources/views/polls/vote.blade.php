@@ -1,3 +1,5 @@
+{{-- Charge l'app Vue de vote et lui transmet le token du lien pour récupérer le sondage côté API --}}
+
 <x-vue-app-layout>
     <x-slot:scripts>
         @vite(['resources/js/poll-dashboard.js'])

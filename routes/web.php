@@ -32,7 +32,7 @@ Route::controller(AuthController::class)->group(function () {
 });
 
 // Page de consultation accessible via lien de partage.
-// Le vote reste protégé côté API, mais les résultats publics doivent rester lisibles sans connexion.
+// Le vote est protégé côté API, mais les résultats publics restent lisibles sans connexion.
 Route::get('/polls/vote/{token}', fn(string $token) => view('polls.vote', ['token' => $token]))
     ->name('polls.vote');
 

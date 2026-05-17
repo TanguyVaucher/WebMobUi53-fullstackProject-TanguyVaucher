@@ -1,3 +1,5 @@
+{{-- Charge l'app Vue du dashboard et lui transmet les sondages de l'utilisateur connecté --}}
+
 <x-default-layout>
   <x-slot:scripts>
     @vite(['resources/js/poll-dashboard-integrated.js'])

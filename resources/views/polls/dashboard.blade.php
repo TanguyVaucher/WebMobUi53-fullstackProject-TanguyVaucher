@@ -1,3 +1,5 @@
+{{-- Charge la version intégrée du dashboard Vue, sans données initiales sauf l'URL de connexion --}}
+
 <x-vue-app-layout>
     <x-slot:scripts>
         @vite(['resources/js/poll-dashboard.js'])

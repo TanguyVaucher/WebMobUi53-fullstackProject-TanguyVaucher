@@ -167,7 +167,7 @@ class DatabaseSeeder extends Seeder
                     ]
                 ]);
 
-                // Insert poll data for the README test account.
+                // Compte de test pour les sondages
                 DB::table('polls')->insert([
                     [
                         'id' => 23,
@@ -307,7 +307,7 @@ class DatabaseSeeder extends Seeder
                     ],
                 ]);
 
-                // Insert options for the test polls.
+                // Options des sondages test
                 DB::table('poll_options')->insert([
                     ['id' => 75, 'poll_id' => 23, 'label' => 'La revanche des sith', 'created_at' => new \DateTime('2026-05-14 18:10:05'), 'updated_at' => new \DateTime('2026-05-14 22:04:11')],
                     ['id' => 76, 'poll_id' => 23, 'label' => 'L\'empire contre-attaque', 'created_at' => new \DateTime('2026-05-14 18:10:05'), 'updated_at' => new \DateTime('2026-05-14 22:04:11')],
@@ -342,7 +342,7 @@ class DatabaseSeeder extends Seeder
                     ['id' => 105, 'poll_id' => 30, 'label' => 'George Michael', 'created_at' => new \DateTime('2026-05-14 20:14:53'), 'updated_at' => new \DateTime('2026-05-14 21:49:50')],
                 ]);
 
-                // Insert votes so the test account has dashboard data with results.
+                // Votes des sondages test
                 DB::table('poll_votes')->insert([
                     ['id' => 10, 'poll_id' => 23, 'user_id' => 5, 'poll_option_id' => 75, 'created_at' => new \DateTime('2026-05-14 22:08:52'), 'updated_at' => new \DateTime('2026-05-14 22:08:52')],
                     ['id' => 11, 'poll_id' => 26, 'user_id' => 5, 'poll_option_id' => 88, 'created_at' => new \DateTime('2026-05-14 20:29:02'), 'updated_at' => new \DateTime('2026-05-14 20:29:02')],
