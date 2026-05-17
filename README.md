@@ -4,7 +4,7 @@ Ce dépôt est basé sur le mini-projet Laravel de Monsieur Ludovic Delafontaine
 
 Le projet de base est une application Laravel de type réseau social. Dans ce rendu, un module de sondages a été ajouté avec une interface frontend en Vue.js. Ce module permet de créer, configurer, partager, voter et consulter les résultats de sondages depuis une interface intégrée à Laravel.
 
-Une attention particulière a été donnée à l'architecture frontend, aux choix techniques, à la lisibilité du code et à l'expérience utilisateur (UX/UI). L'interface est utilisable sur mobile, tablette et desktop.
+Une attention particulière a été donnée à l'architecture frontend et à l'expérience utilisateur (UX/UI). L'interface est utilisable sur mobile, tablette et desktop.
 
 Les changements apportés au projet sont référencés dans le fichier `CHANGELOG.md`
 
