@@ -24,3 +24,5 @@ Homestead.yaml
 Thumbs.db
 projet2.md
 PROJET2.md
+*.md
+!README.md
