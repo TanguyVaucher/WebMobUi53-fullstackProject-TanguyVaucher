@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StorePollVoteRequest extends FormRequest
 {
-    // Authentification vérifiée par le middleware de la route
+    // La connexion est vérifiée côté middleware de la route
     public function authorize(): bool
     {
         return true;
@@ -15,8 +15,9 @@ class StorePollVoteRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // Le vote doit contenir au moins une option
             'option_ids'   => ['required', 'array', 'min:1'],
-            // chaque id doit exister dans la table poll_options
+            // Chaque option envoyee doit etre unique et exister en bdd
             'option_ids.*' => ['integer', 'distinct', 'exists:poll_options,id'],
         ];
     }
