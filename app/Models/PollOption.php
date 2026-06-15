@@ -8,19 +8,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PollOption extends Model
 {
+    // Champs autorisés
     protected $fillable = ['poll_id', 'label'];
 
-    /**
-     * Get the poll that owns the option.
-     */
+    // Relations Eloquent
+
+    // Une option de sondage appartient à un sondage
     public function poll(): BelongsTo
     {
         return $this->belongsTo(Poll::class);
     }
 
-    /**
-     * Get the votes for this option.
-     */
+    // Une option de sondage possède 0..* vote(s)
     public function votes(): HasMany
     {
         return $this->hasMany(PollVote::class);

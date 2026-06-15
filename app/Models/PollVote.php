@@ -7,27 +7,24 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PollVote extends Model
 {
+    // Champs autorisés
     protected $fillable = ['poll_id', 'user_id', 'poll_option_id'];
 
-    /**
-     * Get the poll that owns the vote.
-     */
+    // Relations Eloquent
+
+    // Un vote est lié à un sondage
     public function poll(): BelongsTo
     {
         return $this->belongsTo(Poll::class);
     }
 
-    /**
-     * Get the user that cast the vote.
-     */
+    // Un vote est lié à un utilisateur
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the option chosen.
-     */
+    // Un vote est lié à une option de sondage
     public function option(): BelongsTo
     {
         return $this->belongsTo(PollOption::class, 'poll_option_id');

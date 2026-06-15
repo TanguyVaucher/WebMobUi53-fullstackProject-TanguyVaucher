@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Poll extends Model
 {
-    // Champs qu'on peut remplir en masse (create/update)
+    // Champs constituant un poll et autorisés à être remplis en une seule opération (create/update)
     protected $fillable = [
         'title',
         'question',
@@ -22,38 +22,43 @@ class Poll extends Model
         'ends_at',
     ];
 
-    // Conversions automatiques des types
+    // Cast des types
     protected $casts = [
-        'is_draft'               => 'boolean',
+        'is_draft'               => 'boolean', /* DB : 0/1 <-> PHP true/false */
         'allow_multiple_choices' => 'boolean',
         'allow_vote_change'      => 'boolean',
         'results_public'         => 'boolean',
-        'started_at'             => 'datetime',
+        'started_at'             => 'datetime', /* DB : date/heure <-> PHP objet date */
         'ends_at'                => 'datetime',
     ];
 
-    // Vérifie si le sondage est terminé (ends_at dans le passé)
+    // Vérification si un sondage est terminé (ends_at dans le passé)
     public function isExpired(): bool
     {
         return $this->ends_at !== null && $this->ends_at->isPast();
     }
 
-    // Vérifie si le sondage est actif (lancé + pas expiré)
+    // Vérification si un sondage est actif (publié et non-expiré)
     public function isActive(): bool
     {
         return !$this->is_draft && !$this->isExpired();
     }
 
+    // Relations Eloquent
+
+    // Un sondage appartient à un utilisateur
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    // Un sondage possède 2..* option(s)
     public function options(): HasMany
     {
         return $this->hasMany(PollOption::class);
     }
 
+    // Un sondage possède 0..* vote(s)
     public function votes(): HasMany
     {
         return $this->hasMany(PollVote::class);
