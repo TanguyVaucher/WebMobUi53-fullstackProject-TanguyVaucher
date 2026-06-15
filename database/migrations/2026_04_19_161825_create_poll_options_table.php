@@ -8,13 +8,14 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Table poll_options : Stockage des options des sondages
      */
     public function up(): void
     {
         Schema::create('poll_options', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('poll_id')->constrained('polls')->onDelete('cascade');
-            $table->string('label');
+            $table->foreignId('poll_id')->constrained('polls')->onDelete('cascade'); /* Référence les options d'un sondage */
+            $table->string('label'); /* Nom de l'option */
             $table->timestamps();
         });
     }
