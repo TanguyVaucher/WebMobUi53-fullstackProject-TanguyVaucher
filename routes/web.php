@@ -31,15 +31,16 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('/auth/login', 'login');
 });
 
-// Page de consultation accessible via lien de partage.
 // Le vote est protégé côté API, mais les résultats publics restent lisibles sans connexion.
+// Afficher la page de vote d'un sondage, partagé par son lien
 Route::get('/polls/vote/{token}', fn(string $token) => view('polls.vote', ['token' => $token]))
     ->name('polls.vote');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/polls/dashboard', PollDashboardController::class)->name('polls.dashboard');
+    Route::get('/polls/dashboard', [PollDashboardController::class, 'show'])->name('polls.dashboard');
     Route::get('/polls/dashboard-integrated', fn() => view('polls.dashboard-integrated'))
         ->name('polls.dashboard-integrated');
+
     Route::resource('posts', PostController::class)->except(['index', 'show']);
     Route::singleton('my-profile', MyProfileController::class)->destroyable();
     Route::match(['put', 'patch'], '/likes/{post}', [LikeController::class, 'update']);

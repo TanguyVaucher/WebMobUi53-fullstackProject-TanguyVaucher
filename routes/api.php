@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/v1/foo', [ApiFooController::class, 'store']);
 });
 
+
 // Routes polls — IMPORTANT : déclarer /token/{token} AVANT /{poll}
 // pour éviter que Laravel ne tente de résoudre "token" comme un Poll
 Route::prefix('v1/polls')->group(function () {
