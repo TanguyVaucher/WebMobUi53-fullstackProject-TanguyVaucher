@@ -1,3 +1,5 @@
+// Synchronisation automatique de données Vue avec le localStorage
+
 import { ref, watch } from "vue";
 import * as jsonStorage from "@/utils/jsonStorage.js";
 

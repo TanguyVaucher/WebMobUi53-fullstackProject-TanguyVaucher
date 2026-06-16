@@ -1,10 +1,9 @@
+// Composable qui gère le CRUD des sondages du dashboard via l’API.
+// Utilisé par AppPollDashboard.vue et PollEditor.vue
+
 import { ref } from 'vue';
 import { useFetchApi } from './useFetchApi';
 
-/**
- * Gère le CRUD des sondages du user connecté.
- * Expose : polls, loading, error, et les fonctions fetchPolls, createPoll, updatePoll, deletePoll.
- */
 export function usePolls() {
     const { fetchApi } = useFetchApi();
 
@@ -12,7 +11,7 @@ export function usePolls() {
     const loading = ref(false);
     const error   = ref(null);
 
-    // Charge la liste des sondages du user
+    // Charger la liste des sondages du user
     async function fetchPolls() {
         loading.value = true;
         error.value   = null;
@@ -25,33 +24,33 @@ export function usePolls() {
         }
     }
 
-    // Crée un sondage, retourne le sondage créé
+    // Créer un sondage
     async function createPoll(data) {
         const poll = await fetchApi({ url: '/polls', data });
-        // On l'ajoute en tête de liste sans recharger
+        // L'ajouter en tête du tableau des polls sans recharger grâce à ref
         polls.value.unshift(poll);
         return poll;
     }
 
-    // Met à jour un sondage, retourne le sondage mis à jour
+    // Updater un sondage
     async function updatePoll(id, data) {
+        // Màj du sondage
         const updated = await fetchApi({ url: `/polls/${id}`, data, method: 'PATCH' });
-        // Remplacer dans la liste locale
+        // Remplacer dans le tableau local
         const idx = polls.value.findIndex(p => p.id === id);
-        if (idx !== -1) polls.value[idx] = updated;
+        if (idx !== -1) polls.value[idx] = updated; // Si existant
         return updated;
     }
 
-    // Supprime un sondage
-    // Note : Laravel retourne 204 No Content (sans body JSON), donc fetchApi
-    // va rejeter la promesse malgré le succès. On catch le 204 et on continue.
+    // Supprimer un sondage
     async function deletePoll(id) {
         try {
             await fetchApi({ url: `/polls/${id}`, method: 'DELETE' });
         } catch (err) {
+            // Laravel renvoie 204 No Content après la suppression (le sondage est bien supprimé, mais la réponse est vide)
             if (err?.status !== 204) throw err;
         }
-        // Mise à jour réactive — retire le sondage de la liste sans recharger
+        // Retirer le sondage du tableau local avec filter (nouveau tableau sans l'id supprimé)
         polls.value = polls.value.filter(p => p.id !== id);
     }
 

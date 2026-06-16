@@ -1,47 +1,48 @@
 /**
  * Palette de couleurs disponibles pour les sondages.
+ * Solid sert aux applats, et from / via / to servent aux dégradés.
  */
 export const POLL_COLORS = {
     indigo: {
         label:  'Indigo',
-        solid:  '#818cf8',           // teinte unique si pas d'anim
-        from:   '#818cf8',           // indigo-400
-        via:    '#6366f1',           // indigo-500
-        to:     '#a5b4fc',           // indigo-300 (proche)
+        solid:  '#818cf8',
+        from:   '#818cf8',
+        via:    '#6366f1',
+        to:     '#a5b4fc',
     },
     violet: {
         label:  'Violet',
         solid:  '#a78bfa',
-        from:   '#a78bfa',           // violet-400
-        via:    '#8b5cf6',           // violet-500
-        to:     '#c4b5fd',           // violet-300
+        from:   '#a78bfa',
+        via:    '#8b5cf6',
+        to:     '#c4b5fd',
     },
     sky: {
         label:  'Ciel',
         solid:  '#38bdf8',
-        from:   '#38bdf8',           // sky-400
-        via:    '#0ea5e9',           // sky-500
-        to:     '#7dd3fc',           // sky-300
+        from:   '#38bdf8',
+        via:    '#0ea5e9',
+        to:     '#7dd3fc',
     },
     teal: {
         label:  'Turquoise',
         solid:  '#2dd4bf',
-        from:   '#2dd4bf',           // teal-400
-        via:    '#14b8a6',           // teal-500
-        to:     '#5eead4',           // teal-300
+        from:   '#2dd4bf',
+        via:    '#14b8a6',
+        to:     '#5eead4',
     },
     pink: {
         label:  'Rose',
         solid:  '#f472b6',
-        from:   '#f472b6',           // pink-400
-        via:    '#ec4899',           // pink-500
-        to:     '#f9a8d4',           // pink-300
+        from:   '#f472b6',
+        via:    '#ec4899',
+        to:     '#f9a8d4',
     },
     orange: {
         label:  'Orange',
         solid:  '#fb923c',
-        from:   '#fb923c',           // orange-400
-        via:    '#f97316',           // orange-500
-        to:     '#fdba74',           // orange-300
+        from:   '#fb923c',
+        via:    '#f97316',
+        to:     '#fdba74',
     },
 };

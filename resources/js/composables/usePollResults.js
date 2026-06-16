@@ -1,10 +1,9 @@
+// Composable qui charge les résultats d’un sondage via son token depuis l’API et expose les données, l’état de chargement et les erreurs.
+// Utilisé avec usePolling pour le refresh automatique.
+
 import { ref } from 'vue';
 import { useFetchApi } from './useFetchApi';
 
-/**
- * Charge les résultats d'un sondage via son token.
- * Utilisé avec usePolling pour le refresh automatique.
- */
 export function usePollResults() {
     const { fetchApi } = useFetchApi();
 
@@ -12,7 +11,7 @@ export function usePollResults() {
     const loading     = ref(false);
     const error       = ref(null);
 
-    // Récupère les résultats — appelée aussi par usePolling toutes les 5s
+    // Récupère les résultats via l'API
     async function fetchResults(token) {
         loading.value = true;
         error.value   = null;

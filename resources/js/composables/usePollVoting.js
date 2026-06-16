@@ -1,10 +1,9 @@
+// Composable qui gère la logique de vote d’un sondage via son token
+// Utilisé par PollVote.vue
+
 import { ref } from 'vue';
 import { useFetchApi } from './useFetchApi';
 
-/**
- * Gère l'affichage et le vote d'un sondage via son token.
- * Utilisé dans PollVote.vue.
- */
 export function usePollVoting() {
     const { fetchApi } = useFetchApi();
 
@@ -17,7 +16,7 @@ export function usePollVoting() {
     const error           = ref(null);
     const voteError       = ref(null);
 
-    // Charge le sondage public via son token
+    // Charger le sondage public via son token
     async function fetchPollByToken(token) {
         loading.value = true;
         error.value   = null;
@@ -35,7 +34,7 @@ export function usePollVoting() {
         }
     }
 
-    // Soumet le vote, retourne true si succès
+    // Soumettre le vote
     async function submitVote(token) {
         voteError.value = null;
         try {
@@ -51,15 +50,15 @@ export function usePollVoting() {
         }
     }
 
-    // Gère la sélection : radio (choix unique) ou checkbox (choix multiple)
+    // Gèrer la sélection : radio (si unique) ou checkbox (si multiple)
     function toggleOption(id, allowMultiple) {
         if (allowMultiple) {
-            // Toggle dans le tableau
+            // Toggle : ajouter l’option si elle n’est pas encore sélectionnée, sinon la retirer
             const idx = selectedOptions.value.indexOf(id);
             if (idx === -1) selectedOptions.value.push(id);
             else selectedOptions.value.splice(idx, 1);
         } else {
-            // Remplacer par le seul choix
+            // Appliquer le choix simple
             selectedOptions.value = [id];
         }
     }

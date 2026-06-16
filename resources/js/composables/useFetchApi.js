@@ -1,3 +1,6 @@
+// Composable de base qui centralise les appels HTTP à l’API Laravel, avec la gestion des requêtes, des réponses JSON et des erreurs.
+// Utilisé par usePolls, usePollVoting et usePollResults.
+
 import { ref, shallowRef } from "vue";
 
 const defaultHeaders = {
