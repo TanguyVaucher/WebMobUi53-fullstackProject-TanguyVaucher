@@ -1,11 +1,11 @@
 <script setup>
 import { onMounted } from 'vue';
 import { usePollResults } from '../composables/usePollResults';
-import { usePolling }     from '../composables/usePolling';
+import { usePolling } from '../composables/usePolling';
 
 const props = defineProps({
-    token:     { type: String, required: true },
-    hasBack:   { type: Boolean, default: false },
+    token: { type: String, required: true },
+    hasBack: { type: Boolean, default: false },
     backLabel: { type: String, default: '← Retour au sondage' },
 });
 const emit = defineEmits(['back', 'poll-loaded']);
@@ -36,7 +36,8 @@ function barColor(index) {
 
         <!-- Chargement initial -->
         <div v-if="loading && !results" class="text-center py-16 text-slate-400">
-            <div class="w-8 h-8 border-2 border-indigo-300 border-t-indigo-500 rounded-full animate-spin mx-auto mb-3"></div>
+            <div class="w-8 h-8 border-2 border-indigo-300 border-t-indigo-500 rounded-full animate-spin mx-auto mb-3">
+            </div>
             Chargement...
         </div>
 
@@ -48,12 +49,8 @@ function barColor(index) {
         <template v-else-if="results">
 
             <!-- Bouton retour -->
-            <button
-                v-if="hasBack"
-                @click="emit('back')"
-                class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500
-                       hover:text-indigo-600 transition-colors duration-150"
-            >
+            <button v-if="hasBack" @click="emit('back')" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500
+                       hover:text-indigo-600 transition-colors duration-150">
                 {{ backLabel }}
             </button>
 
@@ -68,16 +65,14 @@ function barColor(index) {
                     </p>
 
                     <!-- Label Live (vert) -->
-                    <span v-if="!results.expired"
-                          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
+                    <span v-if="!results.expired" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
                                  text-sm font-bold text-emerald-600 bg-emerald-50 border border-emerald-200">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         Live
                     </span>
 
                     <!-- Label Terminé (rouge) -->
-                    <span v-else
-                          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
+                    <span v-else class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
                                  text-sm font-bold text-red-500 bg-red-50 border border-red-200">
                         <span class="w-2 h-2 rounded-full bg-red-400"></span>
                         Terminé
@@ -86,11 +81,7 @@ function barColor(index) {
 
                 <!-- Graphique barres CSS -->
                 <div class="space-y-5">
-                    <div
-                        v-for="(opt, i) in results.options"
-                        :key="opt.id"
-                        class="space-y-2"
-                    >
+                    <div v-for="(opt, i) in results.options" :key="opt.id" class="space-y-2">
                         <div class="flex items-center justify-between">
                             <span class="font-semibold text-slate-800 text-base truncate pr-4">{{ opt.label }}</span>
                             <span class="text-slate-500 font-bold text-base shrink-0">
@@ -99,11 +90,8 @@ function barColor(index) {
                         </div>
                         <!-- Barre de progression CSS -->
                         <div class="h-4 w-full rounded-full bg-slate-100 overflow-hidden">
-                            <div
-                                class="h-full rounded-full transition-all duration-700 ease-out"
-                                :class="barColor(i)"
-                                :style="{ width: opt.percentage + '%' }"
-                            ></div>
+                            <div class="h-full rounded-full transition-all duration-700 ease-out" :class="barColor(i)"
+                                :style="{ width: opt.percentage + '%' }"></div>
                         </div>
                     </div>
                 </div>
