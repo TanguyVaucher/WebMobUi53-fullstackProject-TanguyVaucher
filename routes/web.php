@@ -41,8 +41,7 @@ Route::middleware('auth')->group(function () {
 
     // Affichage du tableau de board des polls
     Route::get('/polls/dashboard', [PollDashboardController::class, 'show']);
-
-    Route::get('/polls/dashboard-integrated', function () { return view('polls.dashboard-integrated'); });
+    
     Route::resource('posts', PostController::class)->except(['index', 'show']);
     Route::singleton('my-profile', MyProfileController::class)->destroyable();
     Route::match(['put', 'patch'], '/likes/{post}', [LikeController::class, 'update']);

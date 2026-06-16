@@ -8,9 +8,9 @@ export default defineConfig({
         vue(),
         laravel({
             input: [
+                // Fichiers compilés par vite (point d'entrée du front)
                 'resources/css/app.css',
                 'resources/js/poll-dashboard.js',
-                'resources/js/poll-dashboard-integrated.js',
             ],
             refresh: true,
         }),
