@@ -21,20 +21,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/v1/foo', [ApiFooController::class, 'store']);
 });
 
-
-// Routes polls — IMPORTANT : déclarer /token/{token} AVANT /{poll}
-// pour éviter que Laravel ne tente de résoudre "token" comme un Poll
 Route::prefix('v1/polls')->group(function () {
 
-    // Routes publiques via token (auth optionnelle pour détecter le user)
-    Route::get('/token/{token}', [ApiPollController::class, 'showByToken']);
-    Route::get('/token/{token}/results', [ApiPollController::class, 'results']);
+    // Routes publiques via token (auth optionnel)
+    Route::get('/token/{token}', [ApiPollController::class, 'showByToken']); // Récupérer les données d'un sondage
+    Route::get('/token/{token}/results', [ApiPollController::class, 'results']); // Accéder aux résultats d'un sondage
 
-    // Vote : authentification requise
-    Route::post('/token/{token}/vote', [ApiPollController::class, 'vote'])
-        ->middleware('auth:sanctum');
+    // Voter (auth requis)
+    Route::post('/token/{token}/vote', [ApiPollController::class, 'vote'])->middleware('auth:sanctum');
 
-    // CRUD propriétaire : authentification requise
+    // CRUD (auth requis)
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [ApiPollController::class, 'index']);
         Route::post('/', [ApiPollController::class, 'store']);
