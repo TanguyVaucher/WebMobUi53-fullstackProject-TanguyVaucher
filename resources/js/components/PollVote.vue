@@ -1,35 +1,44 @@
+<!-- Composant qui charge un sondage via son token, affiche ses options et permet à l’utilisateur de voter -->
+
 <script setup>
 import { onMounted, computed } from 'vue';
 import { usePollVoting } from '../composables/usePollVoting';
 import { POLL_COLORS } from '../utils/pollColors';
 
+// Reçoit le token du sondage à charger
 const props = defineProps({
     token: { type: String, required: true },
 });
+
+// Émet au parent la confirmation du vote et l’ouverture des résultats
 const emit = defineEmits(['voted', 'results']);
 
+// Récupère depuis le composable usePollVoting les données pour afficher le sondage et gérer le vote
 const {
     poll, isOwner, hasVoted, expired,
     selectedOptions, loading, error, voteError,
     fetchPollByToken, submitVote, toggleOption,
 } = usePollVoting();
 
-// Charge le sondage au montage du composant
+// Charge le sondage
 onMounted(() => fetchPollByToken(props.token));
 
+// Soumet le vote
 async function handleVote() {
     if (selectedOptions.value.length === 0) return;
     const ok = await submitVote(props.token);
     if (ok) emit('voted');
 }
 
-// Vérifie si une option est sélectionnée
+// Vérifier si une option est sélectionnée
 function isSelected(id) {
     return selectedOptions.value.includes(id);
 }
 
+// Récupèrer le thème de couleur du sondage à partir de sa couleur
 const themeC = computed(() => poll.value?.color ? POLL_COLORS[poll.value.color] : null);
 
+// Crée le dégradé animé du texte de la question
 const questionGradientStyle = computed(() => {
     if (!themeC.value) return {};
     const c = themeC.value;
@@ -43,6 +52,7 @@ const questionGradientStyle = computed(() => {
     };
 });
 
+// Style d'une option sélectionnée selon la couleur du sondage
 const selectedOptionStyle = computed(() => {
     if (!themeC.value) return {};
     const solid = themeC.value.solid;
@@ -54,11 +64,13 @@ const selectedOptionStyle = computed(() => {
     };
 });
 
+// Style d'une checkbox sélectionnée selon la couleur du sondage
 const radioSelectedStyle = computed(() => {
     if (!themeC.value) return {};
     return { borderColor: themeC.value.solid, backgroundColor: themeC.value.solid };
 });
 
+// Crée le dégradé animé du bouton submit
 const buttonGradientStyle = computed(() => {
     if (!themeC.value) return {};
     const c = themeC.value;
@@ -69,6 +81,7 @@ const buttonGradientStyle = computed(() => {
     };
 });
 
+// Couleur du texte coloré (voir les résultats)
 const themeTextStyle = computed(() => themeC.value ? { color: themeC.value.solid } : {});
 </script>
 
@@ -82,14 +95,14 @@ const themeTextStyle = computed(() => themeC.value ? { color: themeC.value.solid
             Chargement...
         </div>
 
-        <!-- Erreur (404, brouillon…) -->
+        <!-- Erreur -->
         <div v-else-if="error" class="rounded-2xl bg-red-50 border border-red-100 px-6 py-8 text-center">
             <p class="text-2xl mb-2">⚠️</p>
             <p class="font-bold text-red-600">{{ error }}</p>
         </div>
 
         <template v-else-if="poll">
-            <!-- En-tête — titre pleine largeur viewport (breakout du conteneur max-w-lg) -->
+            <!-- Question du sondage -->
             <div
                 style="position: relative; left: 50%; transform: translateX(-50%); width: calc(100vw - 20px); padding-bottom: 15px;">
                 <h2 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-center" :style="[
@@ -100,7 +113,7 @@ const themeTextStyle = computed(() => themeC.value ? { color: themeC.value.solid
                 </h2>
             </div>
 
-            <!-- Sondage expiré -->
+            <!-- Message : sondage expiré -->
             <div v-if="expired"
                 class="rounded-2xl bg-slate-100 border border-slate-200 px-5 py-4 flex items-center gap-3">
                 <span class="text-xl">⏱</span>
@@ -110,7 +123,7 @@ const themeTextStyle = computed(() => themeC.value ? { color: themeC.value.solid
                 </div>
             </div>
 
-            <!-- Déjà voté -->
+            <!-- Message : déjà voté -->
             <div v-else-if="hasVoted && !poll.allow_vote_change"
                 class="rounded-2xl bg-emerald-50 border border-emerald-100 px-5 py-4 flex items-center gap-3">
                 <span class="text-xl">✅</span>
@@ -123,13 +136,14 @@ const themeTextStyle = computed(() => themeC.value ? { color: themeC.value.solid
             <!-- Formulaire de vote -->
             <template v-else>
                 <div class="space-y-3" style="padding-top: 10px;">
-                    <!-- Options -->
+
+                    <!-- Charger les options -->
                     <button v-for="opt in poll.options" :key="opt.id" type="button"
                         @click="toggleOption(opt.id, poll.allow_multiple_choices)"
                         class="w-full flex items-center gap-4 rounded-2xl border px-6 py-5 text-left text-lg font-semibold transition-all duration-150 cursor-pointer"
                         :class="isSelected(opt.id) ? '' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'"
                         :style="isSelected(opt.id) ? selectedOptionStyle : {}">
-                        <!-- Indicateur radio/checkbox visuel -->
+                        <!-- Checkbox -->
                         <span
                             class="w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
                             :class="isSelected(opt.id) ? '' : 'border-slate-300'"
@@ -138,12 +152,13 @@ const themeTextStyle = computed(() => themeC.value ? { color: themeC.value.solid
                         </span>
                         {{ opt.label }}
                     </button>
+
                 </div>
 
-                <!-- Erreur vote -->
+                <!-- Erreur de vote -->
                 <p v-if="voteError" class="text-base text-red-500 text-center">{{ voteError }}</p>
 
-                <!-- Bouton voter -->
+                <!-- Bouton voter / modifier le vote -->
                 <button @click="handleVote" :disabled="selectedOptions.length === 0 || loading"
                     class="w-full rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-white font-black py-5 text-xl tracking-wide transition-all duration-150"
                     :style="buttonGradientStyle.background ? buttonGradientStyle : { background: '#6366f1' }">
@@ -151,7 +166,7 @@ const themeTextStyle = computed(() => themeC.value ? { color: themeC.value.solid
                 </button>
             </template>
 
-            <!-- Lien vers les résultats si publics ou propriétaire -->
+            <!-- Voir les résultats (si public ou propriétaire) -->
             <button v-if="poll.results_public || isOwner" @click="emit('results')"
                 class="w-full text-center text-lg font-semibold transition-colors pt-2 cursor-pointer"
                 :style="themeTextStyle.color ? themeTextStyle : { color: '#6366f1' }">
@@ -163,6 +178,7 @@ const themeTextStyle = computed(() => themeC.value ? { color: themeC.value.solid
 
 <style scoped>
 @keyframes gradientShift {
+    /* Animation du dégradé */
     0% {
         background-position: 0% 0%;
     }

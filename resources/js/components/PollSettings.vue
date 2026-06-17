@@ -1,6 +1,9 @@
+<!-- Composant utilisé dans PollEditor.vue pour afficher et modifier les paramètres d’un sondage -->
+
 <script setup>
 import { ref } from 'vue';
-// Paramètres du sondage — compatible v-model sur un objet settings
+
+// Reçoit depuis PollEditor.vue l’objet des paramètres du sondage à afficher et modifier
 const props = defineProps({
     modelValue: {
         type: Object,
@@ -13,28 +16,34 @@ const props = defineProps({
         }),
     },
 });
+
+// Transmet au parent les modifications des paramètres et l’action de dépublication
 const emit = defineEmits(['update:modelValue', 'depublish']);
 
-// Met à jour un champ dans l'objet settings
+// Met à jour un paramètre du sondage et renvoie le nouvel objet settings
 function update(key, value) {
     emit('update:modelValue', { ...props.modelValue, [key]: value });
 }
 
-// Convertit les minutes (UI) en secondes (API)
+// Convertit les secondes (API) en minutes (UI)
 function durationMinutes() {
     return props.modelValue.duration ? Math.floor(props.modelValue.duration / 60) : '';
 }
+
+// Convertit la saisie en minutes (UI) en secondes et màj les settings du sondage (API)
 function setDuration(minutes) {
     const secs = minutes ? parseInt(minutes) * 60 : null;
     update('duration', secs);
 }
 
+// Multiplicateur pour le raccourcis de saisie de la durée
 const multiplier = ref(1);
 </script>
 
 <template>
     <div class="space-y-5">
-        <!-- Toggles booléens -->
+
+        <!-- Toggles choix multiple -->
         <label class="flex items-center justify-between cursor-pointer">
             <span class="text-base font-medium text-slate-700">Choix multiple</span>
             <button type="button" @click="update('allow_multiple_choices', !modelValue.allow_multiple_choices)"
@@ -45,6 +54,7 @@ const multiplier = ref(1);
             </button>
         </label>
 
+        <!-- Toggles Résultats publics -->
         <label class="flex items-center justify-between cursor-pointer">
             <span class="text-base font-medium text-slate-700">Résultats publics</span>
             <button type="button" @click="update('results_public', !modelValue.results_public)"
@@ -55,6 +65,7 @@ const multiplier = ref(1);
             </button>
         </label>
 
+        <!-- Toggles Modifier le vote -->
         <label class="flex items-center justify-between cursor-pointer">
             <span class="text-base font-medium text-slate-700">Modifier le vote</span>
             <button type="button" @click="update('allow_vote_change', !modelValue.allow_vote_change)"
@@ -70,6 +81,7 @@ const multiplier = ref(1);
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <span class="text-base font-medium text-slate-700">Durée (en min)</span>
                 <div class="flex items-center gap-1.5 flex-wrap">
+
                     <!-- Multiplicateur chevrons -->
                     <div class="flex flex-col items-center">
                         <button type="button" @click="multiplier = Math.min(9, multiplier + 1)"
@@ -89,6 +101,8 @@ const multiplier = ref(1);
                             </svg>
                         </button>
                     </div>
+
+                    <!-- Boutons de durée rapide -->
                     <button type="button" @click="setDuration(60 * multiplier)"
                         class="rounded-lg px-2.5 py-1 text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-600 transition-colors w-[4.5rem] text-center">{{
                         multiplier }} heure{{ multiplier > 1 ? 's' : '' }}</button>
@@ -103,6 +117,8 @@ const multiplier = ref(1);
                         multiplier }} mois</button>
                 </div>
             </div>
+
+            <!-- Champ de saisie de la durée -->
             <div class="relative flex items-stretch">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -115,7 +131,7 @@ const multiplier = ref(1);
                 <input type="number" min="1" placeholder="N minutes" :value="durationMinutes()"
                     @input="setDuration($event.target.value)"
                     class="flex-1 rounded-xl border border-slate-200 bg-white pl-9 pr-3 py-2 text-base outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all" />
-                <!-- + / - -->
+                <!-- Boutons +/- -->
                 <div class="flex flex-col gap-1 ml-2">
                     <button type="button" @click="setDuration((durationMinutes() || 0) + 1)"
                         class="flex-1 flex items-center justify-center rounded-md px-2 transition-all duration-200 ease-in-out"
@@ -142,7 +158,7 @@ const multiplier = ref(1);
             </div>
         </div>
 
-        <!-- Lancer le sondage (brouillon → actif) -->
+        <!-- Bouton de lancement du sondage -->
         <div v-if="modelValue.is_draft" class="pt-3 border-t border-slate-100">
             <label class="flex items-center justify-between cursor-pointer">
                 <div>
@@ -156,6 +172,7 @@ const multiplier = ref(1);
             </label>
         </div>
 
+        <!-- Bouton d'arrêt du sondage -->
         <div v-else class="pt-3 border-t border-slate-100 flex items-center justify-between">
             <div class="flex items-center gap-2 text-emerald-600 text-lg font-medium">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse inline-block"></span>

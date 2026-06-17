@@ -1,3 +1,5 @@
+<!-- Composant qui centralise l’édition d’un sondage, puis l'enregistre via l’API -->
+
 <script setup>
 import { ref, computed } from 'vue';
 import PollOptionsEditor from './PollOptionsEditor.vue';
@@ -6,28 +8,33 @@ import PollShareLink from './PollShareLink.vue';
 import { usePolls } from '../composables/usePolls';
 import { POLL_COLORS } from '../utils/pollColors';
 
+// Reçoit depuis AppPollDashboard.vue le sondage à éditer (null en mode création)
 const props = defineProps({
     poll: { type: Object, default: null },
 });
-const emit = defineEmits(['saved', 'cancel', 'question-change']);
 
+// Émet au parent la sauvegarde du sondage et les changements de question (Header réactif)
+const emit = defineEmits(['saved', 'question-change']);
+
+// Récupèrer depuis le composable usePolls create et edit
 const { createPoll, updatePoll } = usePolls();
+// Détecter un edit quand un sondage est reçu en props
 const isEditing = computed(() => props.poll !== null);
 
-// Choisit une couleur au hasard, jamais la même que la précédente
+// Déterminer une couleur de thème au hasard (jamais la même que la précédente)
 const colorKeys = Object.keys(POLL_COLORS);
 let _lastPicked = null;
 function randomColor(current = null) {
-    const exclude = current ?? _lastPicked;
-    const choices = colorKeys.filter(k => k !== exclude);
-    const picked = choices[Math.floor(Math.random() * choices.length)];
+    const exclude = current ?? _lastPicked; // Couleur à explure
+    const choices = colorKeys.filter(k => k !== exclude); // Tableau sans l'exclusion
+    const picked = choices[Math.floor(Math.random() * choices.length)]; // Choix de la couleur
     _lastPicked = picked;
     return picked;
 }
 
-// État local du formulaire
+// Initialisation de l’état local du formulaire à partir du sondage existant, ou avec des valeurs par défaut en mode création
 const question = ref(props.poll?.question ?? '');
-const color = ref(props.poll?.color ?? randomColor(null));  // thème aléatoire par défaut
+const color = ref(props.poll?.color ?? randomColor(null));  // Couleur aléatoire par défaut
 const options = ref(
     props.poll?.options?.map(o => ({ id: o.id, label: o.label }))
     ?? [{ label: '' }, { label: '' }]
@@ -40,12 +47,13 @@ const settings = ref({
     is_draft: props.poll?.is_draft ?? true,
 });
 
+// Variables d'état
 const loading = ref(false);
 const error = ref(null);
 const questionFocused = ref(false);
 const questionHovered = ref(false);
 
-// Style dynamique du champ question selon la couleur choisie
+// Style du champ question
 const questionStyle = computed(() => {
     const solid = POLL_COLORS[color.value]?.solid ?? '#6366f1';
     let bgOpacity = '0D';                          // 5% repos
@@ -62,18 +70,9 @@ const questionIconColor = computed(() =>
     POLL_COLORS[color.value]?.solid ?? '#6366f1'
 );
 
-// Prévisualisation — même effet que les cards du dashboard
-const previewStyle = computed(() => {
-    if (!color.value) return { background: '#f1f5f9' };
-    const c = POLL_COLORS[color.value];
-    return {
-        background: `linear-gradient(150deg, ${c.from}, ${c.to}, ${c.via}, ${c.from})`,
-        backgroundSize: '400% 400%',
-        animation: 'gradientShift 5s ease infinite',
-    };
-});
-
+// Dépublier un sondage (brouillon)
 async function onDepublish() {
+    // Si pas encore en base
     if (!props.poll?.id) {
         settings.value = { ...settings.value, is_draft: true };
         return;
@@ -83,12 +82,14 @@ async function onDepublish() {
     settings.value = { ...settings.value, is_draft: true };
 }
 
+// Sauvegarder le sondage
 async function submit() {
     error.value = null;
     if (!question.value.trim()) { error.value = 'La question est requise.'; return; }
     if (options.value.some(o => !o.label.trim())) { error.value = 'Toutes les options doivent avoir un label.'; return; }
     if (!settings.value.duration) { error.value = 'Une durée est requise.'; return; }
 
+    // Indique qu’une sauvegarde est en cours, puis prépare les données du sondage à envoyer à l’API (createPoll() ou updatePoll())
     loading.value = true;
     const payload = {
         question: question.value.trim(),
@@ -117,21 +118,22 @@ async function submit() {
 <template>
     <div class="space-y-6">
 
-        <!-- Message d'erreur -->
+        <!-- Messages d'erreur -->
         <div v-if="error" class="rounded-xl bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-500">
             {{ error }}
         </div>
 
+        <!-- Formulaire création / édition -->
         <form @submit.prevent="submit">
             <div class="bg-white border border-slate-100 overflow-hidden"
                 style="border-radius: 28px; box-shadow: 0 8px 40px 0 rgba(0,0,0,0.06)">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-0 items-stretch">
 
-                    <!-- ── Colonne gauche : question + couleur + options ── -->
+                    <!-- Colonne de gauche -->
                     <div
                         class="space-y-6 px-5 sm:px-8 py-6 sm:py-8 border-b lg:border-b-0 lg:border-r border-slate-200">
 
-                        <!-- Question — champ géant -->
+                        <!-- Question du sondage -->
                         <div class="relative">
                             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -151,12 +153,13 @@ async function submit() {
                                 @mouseleave="questionHovered = false" />
                         </div>
 
-                        <!-- Thème couleur -->
+                        <!-- Choix du thème de couleur -->
                         <div class="space-y-2">
                             <label
                                 class="text-sm font-semibold uppercase tracking-normal text-slate-400 mb-3 block">Couleur
                                 du thème</label>
                             <div class="flex items-center gap-2 flex-wrap" style="min-height: 44px">
+                                <!-- Bouton random -->
                                 <button type="button" @click="color = randomColor(color.value)" class="w-8 h-8 rounded-full border-2 flex items-center justify-center
                                        text-slate-500 bg-slate-100 hover:bg-slate-200 border-transparent
                                        transition-all duration-150" title="Couleur aléatoire">
@@ -169,6 +172,7 @@ async function submit() {
                                         <line x1="4" y1="4" x2="21" y2="21" />
                                     </svg>
                                 </button>
+                                <!-- Boutons couleurs -->
                                 <button v-for="(def, key) in POLL_COLORS" :key="key" type="button" @click="color = key"
                                     class="rounded-full transition-all duration-200"
                                     :style="{ background: def.solid, width: color === key ? '36px' : '30px', height: color === key ? '36px' : '30px', border: color === key ? `4px solid ${def.solid}` : '2px solid transparent' }"
@@ -176,7 +180,7 @@ async function submit() {
                             </div>
                         </div>
 
-                        <!-- Options -->
+                        <!-- Options (délégué à PollOptionsEditor) -->
                         <div class="space-y-1.5">
                             <label
                                 class="text-sm font-semibold uppercase tracking-normal text-slate-400 mb-3 block">Choix
@@ -185,17 +189,17 @@ async function submit() {
                         </div>
                     </div>
 
-                    <!-- ── Colonne droite : paramètres + partage + soumettre ── -->
+                    <!-- Colonne de droite -->
                     <div class="space-y-6 px-5 sm:px-8 py-6 sm:py-8">
 
-                        <!-- Paramètres -->
+                        <!-- Paramètres (délégué à PollSettings) -->
                         <div class="rounded-2xl border border-slate-100 bg-slate-100/60 px-4 py-4">
                             <p class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-4">Paramètres du
                                 sondage</p>
                             <PollSettings v-model="settings" @depublish="onDepublish" />
                         </div>
 
-                        <!-- Lien de partage si édition d'un sondage lancé -->
+                        <!-- Lien de partage si édition d'un sondage lancé (délégué à PollShareLink) -->
                         <div v-if="isEditing && poll?.secret_token" class="space-y-1.5">
                             <label
                                 class="text-sm font-semibold uppercase tracking-normal text-slate-400 mb-1.5 block">Lien
@@ -203,6 +207,7 @@ async function submit() {
                             <PollShareLink :token="poll.secret_token" />
                         </div>
 
+                        <!-- Bouton submit -->
                         <button type="submit" :disabled="loading" class="w-full rounded-2xl bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50
                                text-white font-bold py-3.5 text-xl tracking-wide transition-all duration-150">
                             {{ loading ? 'Sauvegarde...' : (isEditing ? 'Enregistrer' : 'Créer') }}
@@ -213,28 +218,3 @@ async function submit() {
         </form>
     </div>
 </template>
-
-<!-- Animation du dégradé — pas de @apply donc CSS pur, pas de scoped pour éviter les conflits Tailwind v4 -->
-<style>
-@keyframes gradientShift {
-    0% {
-        background-position: 0% 0%;
-    }
-
-    25% {
-        background-position: 100% 50%;
-    }
-
-    50% {
-        background-position: 50% 100%;
-    }
-
-    75% {
-        background-position: 0% 50%;
-    }
-
-    100% {
-        background-position: 0% 0%;
-    }
-}
-</style>

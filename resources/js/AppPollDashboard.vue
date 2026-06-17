@@ -227,7 +227,6 @@ function onVoted() {
                 <!-- @ -> écoute les évenéments emis par PollResults.vue -->
                 <PollResults
                     :token="activeToken"
-                    :has-back="true"
                     :back-label="props.token ? '← Retour au sondage' : '← Retour au dashboard'"
                     @back="backFromResults"
                     @poll-loaded="p => resultsPoll = p"
